@@ -65,7 +65,7 @@ setTimeout(async () => {
     await simulateWrite("Starting Chat Interface\0.\0.\0.", 24);
     await simulateWrite("\0\0\0\0", 12);
 
-    ws = new WebSocket(`wss://luckydye.de:8088/`);
+    ws = new WebSocket(`wss://dev.luckydye.de:8088/ws`);
 
     ws.onopen = function (event) {
         print('\nConnection established.');
