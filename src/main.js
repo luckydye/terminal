@@ -56,13 +56,13 @@ function sleep(time) {
 }
 
 setTimeout(async () => {
-    await print(preroll);
+    await simulateWrite(preroll, 4);
     await sleep(200);
     await simulateWrite("Starting up", 24);
-    await simulateWrite("... ", 2);
+    await simulateWrite("... ", 250);
     await print("[OK]");
     await sleep(200);
-    await simulateWrite("Starting Chat Interface\0.\0.\0.", 24);
+    await simulateWrite("Starting Interface\0.\0.\0.", 24);
     await simulateWrite("\0\0\0\0", 12);
 
     ws = new WebSocket(`wss://dev.luckydye.de:8088/`);
@@ -80,5 +80,9 @@ setTimeout(async () => {
     terminal.addEventListener('submit', e => {
         ws.send(e.value);
     });
+
+    setTimeout(() => {
+        ws.onopen();
+    }, 500);
 
 }, 500);
