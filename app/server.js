@@ -22,7 +22,7 @@ const express = require('express')
 const app = express()
 const port = 3000
 
-app.get('/chat', express.static('src'));
+app.use('/chat', express.static(path.join(__dirname, 'src')));
 
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`)
