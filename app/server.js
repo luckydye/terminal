@@ -1,4 +1,5 @@
 const WebSocket = require('ws');
+const path = require('path');
 
 const wss = new WebSocket.Server({ port: 8088 });
 
