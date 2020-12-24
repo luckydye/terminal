@@ -89,6 +89,9 @@ export default class Terminal extends HTMLElement {
                 width: 100%;
                 height: 100%;
             }
+            canvas {
+                filter: contrast(1.1) blur(.33px);
+            }
         `;
         this.shadowRoot.appendChild(style);
         this.shadowRoot.appendChild(canvas);

@@ -10,7 +10,3 @@ main {
     bottom: 0;
     right: 0;
 }
-
-canvas {
-    filter: blur(.33px);
-}
