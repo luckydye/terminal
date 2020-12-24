@@ -14,6 +14,8 @@ const preroll = `
 \n
 `;
 
+let idle = true;
+
 setTimeout(async () => {
     const terminal = getTerminal();
     
@@ -28,14 +30,18 @@ setTimeout(async () => {
 
     const ws = connectToWebSocket();
 
-    terminal.addEventListener('submit', e => {
-        const args = e.value.split(" ");
-        if(args[0] != "") {
-            if(commands[args[0]]) {
-                commands[args[0]](args.slice(1));
-            } else {
-                ws.send(e.value);
-                print(`\nCommand "${args[0]}" not found.\n`);
+    terminal.addEventListener('submit', async e => {
+        if(idle) {
+            const args = e.value.split(" ");
+            if(args[0] != "") {
+                if(commands[args[0]]) {
+                    idle = false;
+                    await commands[args[0]](args.slice(1));
+                    idle = true;
+                } else {
+                    ws.send(e.value);
+                    print(`\nCommand "${args[0]}" not found.\n`);
+                }
             }
         }
     });

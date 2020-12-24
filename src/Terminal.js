@@ -165,10 +165,21 @@ export default class Terminal extends HTMLElement {
         this.write(this.prefix);
     }
 
-    read() {
-        const currLine = buffer[buffer.length-1];
-        this.inputEnabled = true;
-        this.prefix = currLine;
+    read(newPrefix) {
+        return new Promise((resolve) => {
+            const currLine = buffer[buffer.length-1];
+            this.inputEnabled = true;
+            this.prefix = newPrefix || currLine;
+            if(newPrefix) {
+                this.write(newPrefix);
+            }
+
+            const submitCallback = e => {
+                resolve(e.value);
+                this.removeEventListener('submit', submitCallback);
+            }
+            this.addEventListener('submit', submitCallback);
+        })
     }
 
     newline() {

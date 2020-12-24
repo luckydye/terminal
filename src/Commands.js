@@ -1,4 +1,7 @@
 import { simulateWrite, sleep, print, getTerminal } from './Console.js';
+import chat from './Programm.js';
+
+export const INPUT_PREFIX = "terminal@52.59.209.57:~$ ";
 
 export default {
 
@@ -9,6 +12,21 @@ export default {
     clear(args) {
         const terminal = getTerminal();
         terminal.clear();
+    },
+
+    chat: chat,
+
+    connections(args) {
+        const terminal = getTerminal();
+        terminal.disableInput();
+        terminal.setPrefix("");
+
+        fetch('/connections')
+        .then(res => res.json())
+        .then(async json => {
+            await simulateWrite(`\nActive connections: ${json.data}\n\n`, 12);
+            terminal.read(INPUT_PREFIX);
+        })
     },
 
     exit(args) {

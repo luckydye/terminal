@@ -1,10 +1,10 @@
+import { INPUT_PREFIX } from "./Commands.js";
+
 const terminal = document.createElement('gyro-terminal');
 terminal.disableInput();
 mainEle.appendChild(terminal);
 
 export function connectToWebSocket() {
-    const INPUT_PREFIX = "terminal@52.59.209.57:~$ ";
-
     const ws = new WebSocket(location.origin.replace("https", "wss").replace("http", "ws"));
 
     ws.onopen = function (event) {
@@ -13,6 +13,8 @@ export function connectToWebSocket() {
     };
 
     ws.onmessage = function incoming(msg) {
+        console.log(msg);
+        
         const str = "User: " + msg.data + "\n";
         terminal.append(terminal.cursor[1], str);
     };

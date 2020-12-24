@@ -13,16 +13,45 @@ function broadcast(msg) {
 
 const app = express();
 
-const wsServer = new ws.Server({ noServer: true });
-wsServer.on('connection', socket => {
+const wss = new ws.Server({ noServer: true });
+wss.on('connection', socket => {
+    socket.isAlive = true;
+    socket.on('pong', heartbeat);
+
     connections.push(socket);
 
     socket.on('message', message => {
         // broadcast(message);
     });
+
+    socket.on('disconnect', message => {
+        connections.splice(connections.indexOf(socket), 1);
+    });
+});
+
+function noop() {}
+
+function heartbeat() {
+  this.isAlive = true;
+}
+
+const interval = setInterval(function ping() {
+    wss.clients.forEach(function each(ws) {
+        if (ws.isAlive === false) return ws.terminate();
+
+        ws.isAlive = false;
+        ws.ping(noop);
+    });
+}, 30000);
+
+wss.on('close', function close() {
+    clearInterval(interval);
 });
 
 app.use('/statc', express.static(path.join(__dirname, '../public')));
+app.get('/connections', (req, res) => {
+    res.send(JSON.stringify({ data: connections.length }));
+});
 app.use('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
 });
@@ -32,7 +61,7 @@ const server = app.listen(port, () => {
 });
 
 server.on('upgrade', (request, socket, head) => {
-    wsServer.handleUpgrade(request, socket, head, socket => {
-        wsServer.emit('connection', socket, request);
+    wss.handleUpgrade(request, socket, head, socket => {
+        wss.emit('connection', socket, request);
     });
 });
