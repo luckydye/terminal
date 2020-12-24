@@ -120,8 +120,8 @@ export default class Terminal extends HTMLElement {
     }
 
     clear() {
-        buffer = [];
-        this.read();
+        buffer = [""];
+        this.setCursor(0, 0);
     }
 
     setCursor(x, y) {
@@ -129,7 +129,7 @@ export default class Terminal extends HTMLElement {
         cursor[1] = y != null ? y : cursor[1];
     }
 
-    setPrefix(str) {
+    setPrefix(str = "") {
         this.prefix = str;
     }
 
@@ -186,7 +186,7 @@ export default class Terminal extends HTMLElement {
                 const text = context.measureText("M");
                 CHAR_WIDTH = text.width;
             
-                const temp = buffer[buffer.length-1].split("").slice(0, cursor[0]);
+                const temp = buffer[cursor[1]].split("").slice(0, cursor[0]);
 
                 if(hideOutput) {
                     hiddenBuffer.push(str);
@@ -195,9 +195,9 @@ export default class Terminal extends HTMLElement {
                     temp.push(str);
                 }
         
-                const tail = buffer[buffer.length-1].split("").slice(cursor[0]);
+                const tail = buffer[cursor[1]].split("").slice(cursor[0]);
                 temp.push(...tail);
-                buffer[buffer.length-1] = temp.join("");
+                buffer[cursor[1]] = temp.join("");
                 cursor[0] += str.length;
         }
     }
