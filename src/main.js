@@ -1,10 +1,8 @@
 import './Terminal.js';
+import commands from './Commands.js';
+import { simulateWrite, sleep, print, getTerminal } from './Console.js';
 
 let ws;
-
-const terminal = document.createElement('gyro-terminal');
-terminal.disableInput();
-mainEle.appendChild(terminal);
 
 const preroll = `
 
@@ -18,44 +16,9 @@ const preroll = `
 
 `;
 
-async function simulateWrite(str, ms = 24) {
-    return new Promise((resolve) => {
-        terminal.disableInput();
-
-        const time = ms;
-
-        let index = 0;
-        const int = setInterval(() => {
-
-            const curr = str[index];
-
-            terminal.write(curr);
-
-            index++;
-
-            if (index == str.length) {
-                clearInterval(int);
-                resolve();
-            }
-        }, time);
-    })
-}
-
-function print(str) {
-    const lines = str.split("\n");
-    for (let line of lines) {
-        terminal.write(line);
-        terminal.write('\n');
-    }
-}
-
-function sleep(time) {
-    return new Promise((resolve) => {
-        setTimeout(() => resolve(), time);
-    })
-}
-
 setTimeout(async () => {
+    const terminal = getTerminal();
+    
     await simulateWrite(preroll, 4);
     await sleep(200);
     await simulateWrite("Starting up", 24);
@@ -78,7 +41,13 @@ setTimeout(async () => {
     };
 
     terminal.addEventListener('submit', e => {
-        ws.send(e.value);
+        const args = e.value.split(" ");
+        if(commands[args[0]]) {
+            commands[args[0]](args.slice(1));
+            // ws.send(e.value);
+        } else {
+            print('Unknown Command');
+        }
     });
 
     setTimeout(() => {
