@@ -206,7 +206,8 @@ export default class Terminal extends HTMLElement {
         if(!inputEnabled) return;
         let key = e.key;
         const shift = e.shiftKey;
-        
+        const ctrl = e.ctrlKey;
+
         if(key == "Enter") {
             this.write('\r');
         }
@@ -238,8 +239,12 @@ export default class Terminal extends HTMLElement {
             buffer[buffer.length-1] = temp.join("");
         }
 
-        if(VALID_CHARS.indexOf(key) != -1) {
+        if(VALID_CHARS.indexOf(key) != -1 && !ctrl) {
             this.write(key);
+        }
+
+        if(ctrl) {
+            // ctrl binds
         }
     }
 

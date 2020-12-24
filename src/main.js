@@ -50,6 +50,12 @@ setTimeout(async () => {
         }
     });
 
+    window.addEventListener('paste', e => {
+        e.clipboardData.items[0].getAsString(str => {
+            terminal.write(str);
+        });
+    })
+
     setTimeout(() => {
         ws.onopen();
     }, 500);
