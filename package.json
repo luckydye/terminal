@@ -13,7 +13,8 @@
   },
   "devDependencies": {},
   "scripts": {
-    "build": "webpack"
+    "build": "webpack",
+    "build:w": "webpack -w"
   },
   "repository": {
     "type": "git",

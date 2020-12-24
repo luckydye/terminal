@@ -1,7 +1,7 @@
-const WebSocket = require('ws');
 const path = require('path');
-
-const wss = new WebSocket.Server({ port: 8088 });
+const express = require('express');
+const ws = require('ws');
+const port = 3000;
 
 const connections = [];
 
@@ -11,20 +11,28 @@ function broadcast(msg) {
     }
 }
 
-wss.on('connection', function connection(ws) {
-    connections.push(ws);
+const app = express();
 
-    ws.on('message', function incoming(message) {
+const wsServer = new ws.Server({ noServer: true });
+wsServer.on('connection', socket => {
+    connections.push(socket);
+
+    socket.on('message', message => {
         broadcast(message);
     });
 });
 
-const express = require('express')
-const app = express()
-const port = 3000
+app.use('/statc', express.static(path.join(__dirname, '../public')));
+app.use('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/index.html'));
+});
 
-app.use('/chat', express.static('src'));
+const server = app.listen(port, () => {
+    console.log(`Terminal listening at http://localhost:${port}`)
+});
 
-app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`)
+server.on('upgrade', (request, socket, head) => {
+    wsServer.handleUpgrade(request, socket, head, socket => {
+        wsServer.emit('connection', socket, request);
+    });
 });

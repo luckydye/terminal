@@ -74,6 +74,16 @@ export default class Terminal extends HTMLElement {
             this.reformat();
         })
 
+        window.addEventListener('wheel', e => {
+            const dir = Math.sign(e.deltaY);
+            const lineHeight = CHAR_HEIGHT + LINE_PADDING;
+
+            const cursorY = BORDER_PADDING[1] + (cursor[1] * CHAR_HEIGHT) + (cursor[1] * LINE_PADDING);
+            const maxY = Math.max(0, cursorY - (canvas.height - (lineHeight * 3)));
+
+            view[1] = Math.max(0, Math.min(maxY, view[1] + dir * lineHeight));
+        });
+
         window.addEventListener('keydown', e => {
             this.handleInput(e);
         })
@@ -203,6 +213,10 @@ export default class Terminal extends HTMLElement {
                 buffer[cursor[1]] = temp.join("");
                 cursor[0] += str.length;
         }
+
+        const lineHeight = CHAR_HEIGHT + LINE_PADDING;
+        const cursorY = BORDER_PADDING[1] + (cursor[1] * CHAR_HEIGHT) + (cursor[1] * LINE_PADDING);
+        view[1] = Math.max(0, cursorY - (canvas.height - (lineHeight * 3)));
     }
 
     handleInput(e) {
@@ -289,10 +303,6 @@ export default class Terminal extends HTMLElement {
     }
 
     drawBuffer() {
-        const lineHeight = CHAR_HEIGHT + LINE_PADDING;
-        const cursorY = BORDER_PADDING[1] + (cursor[1] * CHAR_HEIGHT) + (cursor[1] * LINE_PADDING);
-        view[1] = Math.max(0, cursorY - (canvas.height - (lineHeight * 2)));
-
         let index = 0;
         for(let line of buffer) {
             const x = BORDER_PADDING[0];

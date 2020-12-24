@@ -3,7 +3,12 @@ import { simulateWrite, sleep, print, getTerminal } from './Console.js';
 export default {
 
     help(args) {
-        print("No help needed :)");
+        print("\nNo help needed :)\n");
+    },
+
+    clear(args) {
+        const terminal = getTerminal();
+        terminal.clear();
     },
 
     exit(args) {

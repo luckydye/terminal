@@ -16,6 +16,8 @@ const preroll = `
 \n
 `;
 
+const INPUT_PREFIX = "user@web:~$ ";
+
 setTimeout(async () => {
     const terminal = getTerminal();
     
@@ -28,11 +30,11 @@ setTimeout(async () => {
     await simulateWrite("Starting Interface\0.\0.\0.", 24);
     await simulateWrite("\0\0\0\0", 12);
 
-    ws = new WebSocket(`wss://dev.luckydye.de:8088/`);
+    ws = new WebSocket(location.origin.replace("https", "wss").replace("http", "ws"));
 
     ws.onopen = function (event) {
         print('\nConnection established.');
-        simulateWrite("\n> \t", 0);
+        simulateWrite("\n"+INPUT_PREFIX+"\t", 0);
     };
 
     ws.onmessage = function incoming(msg) {
@@ -42,11 +44,13 @@ setTimeout(async () => {
 
     terminal.addEventListener('submit', e => {
         const args = e.value.split(" ");
-        if(commands[args[0]]) {
-            commands[args[0]](args.slice(1));
-            // ws.send(e.value);
-        } else {
-            print('Unknown Command');
+        if(args[0] != "") {
+            if(commands[args[0]]) {
+                commands[args[0]](args.slice(1));
+                // ws.send(e.value);
+            } else {
+                print(`\nCommand "${args[0]}" not found.\n`);
+            }
         }
     });
 
@@ -55,9 +59,5 @@ setTimeout(async () => {
             terminal.write(str);
         });
     })
-
-    setTimeout(() => {
-        ws.onopen();
-    }, 500);
 
 }, 500);
