@@ -1,8 +1,6 @@
 import './Terminal.js';
 import commands from './Commands.js';
-import { simulateWrite, sleep, print, getTerminal } from './Console.js';
-
-let ws;
+import { simulateWrite, sleep, print, getTerminal, connectToWebSocket } from './Console.js';
 
 const preroll = `
 
@@ -16,8 +14,6 @@ const preroll = `
 \n
 `;
 
-const INPUT_PREFIX = "user@web:~$ ";
-
 setTimeout(async () => {
     const terminal = getTerminal();
     
@@ -30,25 +26,15 @@ setTimeout(async () => {
     await simulateWrite("Starting Interface\0.\0.\0.", 24);
     await simulateWrite("\0\0\0\0", 12);
 
-    ws = new WebSocket(location.origin.replace("https", "wss").replace("http", "ws"));
-
-    ws.onopen = function (event) {
-        print('\nConnection established.');
-        simulateWrite("\n"+INPUT_PREFIX+"\t", 0);
-    };
-
-    ws.onmessage = function incoming(msg) {
-        const str = "User: " + msg.data + "\n";
-        terminal.append(terminal.cursor[1], str);
-    };
+    const ws = connectToWebSocket();
 
     terminal.addEventListener('submit', e => {
         const args = e.value.split(" ");
         if(args[0] != "") {
             if(commands[args[0]]) {
                 commands[args[0]](args.slice(1));
-                // ws.send(e.value);
             } else {
+                ws.send(e.value);
                 print(`\nCommand "${args[0]}" not found.\n`);
             }
         }

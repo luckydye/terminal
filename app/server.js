@@ -18,7 +18,7 @@ wsServer.on('connection', socket => {
     connections.push(socket);
 
     socket.on('message', message => {
-        broadcast(message);
+        // broadcast(message);
     });
 });
 

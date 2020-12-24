@@ -5,7 +5,7 @@ const FONT_WEIGHT = 300;
 const FONT_COLOR = '#99d0f7';
 const CURSOR_HEIGHT = 16;
 const CURSOR_WIDTH = 6;
-const VALID_CHARS = " =<>^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ()[]-.,_:;#+'*/&%$§!?€1234567890";
+const VALID_CHARS = ` {}=<>^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ()[]-.,_:;#+'*/&%$§!?€1234567890"`;
 const LINE_PADDING = 3;
 
 let CHAR_WIDTH = 7.69;
