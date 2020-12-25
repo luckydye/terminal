@@ -16,6 +16,37 @@ export default {
         terminal.clear();
     },
 
+    test(args) {
+        return new Promise((resolve) => {
+            const terminal = getTerminal();
+            let running = true;
+
+            terminal.disableInput();
+
+            const cancel = () => {
+                running = false;
+                resolve();
+            }
+
+            terminal.addEventListener('shortcut', e => {
+                if(e.key == "c") cancel();
+            })
+
+            const draw = () => {
+                const ctxt = terminal.getContext();
+
+                ctxt.fillStyle = "red";
+                ctxt.fillRect(100, 100, 100, 100);
+
+                if(running) {
+                    requestAnimationFrame(draw);
+                }
+            }
+
+            draw();
+        });
+    },
+
     async chat(args) {
         const ws = getSocket();
         const id = args[0];

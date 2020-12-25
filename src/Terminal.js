@@ -77,6 +77,7 @@ export default class Terminal extends HTMLElement {
         super();
 
         canvas = document.createElement('canvas');
+        canvas.tabIndex = 0;
         context = canvas.getContext("2d");
 
         window.addEventListener('resize', e => {
@@ -100,6 +101,10 @@ export default class Terminal extends HTMLElement {
         this.attachShadow({ mode: 'open' });
     }
 
+    getContext() {
+        return context;
+    }
+
     init() {
         const style = document.createElement('style');
         style.innerHTML = `
@@ -110,6 +115,7 @@ export default class Terminal extends HTMLElement {
             }
             canvas {
                 filter: contrast(1.1) blur(.33px);
+                outline: none;
             }
         `;
         this.shadowRoot.appendChild(style);
@@ -342,6 +348,9 @@ export default class Terminal extends HTMLElement {
         if(this.inputEnabled) {
             this.drawCursor();
         }
+
+        context.shadowColor = "none";
+        context.shadowBlur = 0;
     }
 
     drawCursor() {
