@@ -373,7 +373,7 @@ export default class Terminal extends HTMLElement {
     getCursorPosition() {
         const max_line_px_length = this.getMaxBufferWidth();
 
-        let posY = 1;
+        let posY = 0;
         for(let i = 0; i < cursor[1]; i++) {
             const line = buffer[i];
             const text = context.measureText(line);
@@ -401,8 +401,8 @@ export default class Terminal extends HTMLElement {
         let y = BORDER_PADDING[1];
 
         const drawLine = (line) => {
-            y += CHAR_HEIGHT + LINE_PADDING - view[1];
             context.fillText(line, x, y);
+            y += CHAR_HEIGHT + LINE_PADDING - view[1];
         }
 
         for(let line of buffer) {
