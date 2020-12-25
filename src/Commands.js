@@ -81,7 +81,7 @@ export default {
         terminal.disableInput();
         terminal.setPrefix("");
 
-        fetch('/connections')
+        return fetch('/connections')
         .then(res => res.json())
         .then(async json => {
             await simulateWrite(`\nActive connections: ${json.data}\n\n`, 12);
