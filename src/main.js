@@ -11,7 +11,7 @@ const preroll = `
 @@@@      @@@@@         /@@@.                        @@@(                 
 (@@@        %           /@@@.                        @@@(                 
   .@                    /@@@.     @@@@@@@@@@@@@      @@@@@@@@@@@@@@@/     
-\n
+
 `;
 
 let idle = true;
@@ -19,13 +19,13 @@ let idle = true;
 setTimeout(async () => {
     const terminal = getTerminal();
     
-    await simulateWrite(preroll, 4);
+    await print(preroll);
     await sleep(200);
-    await simulateWrite("Starting up", 24);
+    await simulateWrite("Starting up", 12);
     await simulateWrite("... ", 250);
     await print("[OK]");
     await sleep(200);
-    await simulateWrite("Starting Interface\0.\0.\0.", 24);
+    await simulateWrite("Connecting to Interface\0.\0.\0.", 24);
     await simulateWrite("\0\0\0\0", 12);
 
     const ws = connectToWebSocket();

@@ -5,7 +5,7 @@ const FONT_WEIGHT = 300;
 const FONT_COLOR = '#99d0f7';
 const CURSOR_HEIGHT = 16;
 const CURSOR_WIDTH = 6;
-const VALID_CHARS = ` {}=<>^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ()[]-.,_:;#+'*/&%$§!?€1234567890"`;
+const VALID_CHARS = ` ~{}=<>^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ()[]-.,_:;#+'*/&%$§!?€1234567890"`;
 const LINE_PADDING = 3;
 
 let CHAR_WIDTH = 7.69;
@@ -31,6 +31,13 @@ class SubmitEvent extends Event {
     constructor(value) {
         super('submit');
         this.value = value;
+    }
+}
+
+class ShortcutEvent extends Event {
+    constructor(key) {
+        super('shortcut');
+        this.key = key;
     }
 }
 
@@ -240,7 +247,7 @@ export default class Terminal extends HTMLElement {
             this.write('\r');
         }
         if(key == "ArrowLeft") {
-            cursor[0] = Math.max(cursor[0]-1, 0);
+            cursor[0] = Math.max(cursor[0]-1, Math.max(prefix.length, 0));
         }
         if(key == "ArrowRight") {
             cursor[0] = Math.min(cursor[0]+1, buffer[buffer.length-1].length);
@@ -249,7 +256,7 @@ export default class Terminal extends HTMLElement {
             cursor[0] = buffer[buffer.length-1].length;
         }
         if(key == "Home") {
-            cursor[0] = 0;
+            cursor[0] = Math.max(prefix.length, 0);
         }
         if(key == "Backspace") {
             if(cursor[0] > 0 && cursor[0] > prefix.length) {
@@ -272,7 +279,7 @@ export default class Terminal extends HTMLElement {
         }
 
         if(ctrl) {
-            // ctrl binds
+            this.dispatchEvent(new ShortcutEvent(key));
         }
     }
 
