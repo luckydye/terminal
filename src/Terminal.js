@@ -343,6 +343,10 @@ export default class Terminal extends HTMLElement {
     reformat() {
         canvas.width = this.clientWidth;
         canvas.height = this.clientHeight;
+
+        const lineHeight = CHAR_HEIGHT + LINE_PADDING;
+        const cursorY = this.getCursorPosition()[1];
+        view[1] = Math.max(0, cursorY - (canvas.height - (lineHeight * 3)));
     }
 
     draw(context) {
