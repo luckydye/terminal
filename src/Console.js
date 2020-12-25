@@ -21,6 +21,9 @@ export default class Console {
     }
 
     static async installModule(module) {
+        // TODO:
+        // Actually "install" them into local storage for reuse.
+        // Also make a "unsintsall" function/method.
         try {
             if(module.install) {
                 const name = module.moduleName || module.origin;
