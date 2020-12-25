@@ -25,6 +25,9 @@ setTimeout(async () => {
     await simulateWrite("Starting up", 12);
     await simulateWrite("... ", 250);
     await print("[OK]");
+
+    await print("\nLorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s\n");
+
     await sleep(200);
     await simulateWrite("Connecting to Interface\0.\0.\0.", 24);
     await simulateWrite("\0\0\0\0", 12);

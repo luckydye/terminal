@@ -365,22 +365,55 @@ export default class Terminal extends HTMLElement {
         }
     }
 
+    getMaxBufferWidth() {
+        return canvas.width - (BORDER_PADDING[0] * 2);
+    }
+
     getCursorPosition() {
+        const max_line_px_length = this.getMaxBufferWidth();
+
+        let posY = 1;
+        for(let i = 0; i < cursor[1]; i++) {
+            const line = buffer[i];
+            const text = context.measureText(line);
+            if(max_line_px_length - text.width < 0) {
+                const parts = sliceLine(line, max_line_px_length / CHAR_WIDTH);
+                for(let part of parts) {
+                    posY++;
+                }
+            } else {
+                posY++;
+            }
+        }
+
         const lineHeight = CHAR_HEIGHT + LINE_PADDING;
         const x = BORDER_PADDING[0] + (cursor[0] * CHAR_WIDTH);
-        const y = BORDER_PADDING[1] + (cursor[1] * CHAR_HEIGHT) + (cursor[1] * LINE_PADDING) + (CHAR_HEIGHT / 2) - (CURSOR_HEIGHT / 2) - view[1];
+        const y = BORDER_PADDING[1] + (posY * CHAR_HEIGHT) + (posY * LINE_PADDING) + (CHAR_HEIGHT / 2) - (CURSOR_HEIGHT / 2) - view[1];
 
         return [x + CURSOR_OFFSET[0], y + CURSOR_OFFSET[1]];
     }
 
     drawBuffer() {
-        let index = 0;
-        for(let line of buffer) {
-            const x = BORDER_PADDING[0];
-            const y = BORDER_PADDING[1] + (index * CHAR_HEIGHT) + (index * LINE_PADDING) - view[1];
+        const max_line_px_length = this.getMaxBufferWidth();
 
+        let x = BORDER_PADDING[0];
+        let y = BORDER_PADDING[1];
+
+        const drawLine = (line) => {
+            y += CHAR_HEIGHT + LINE_PADDING - view[1];
             context.fillText(line, x, y);
-            index++;
+        }
+
+        for(let line of buffer) {
+            const text = context.measureText(line);
+            if(max_line_px_length - text.width < 0) {
+                const parts = sliceLine(line, max_line_px_length / CHAR_WIDTH);
+                for(let part of parts) {
+                    drawLine(part);
+                }
+            } else {
+                drawLine(line);
+            }
         }
     }
 
@@ -389,6 +422,20 @@ export default class Terminal extends HTMLElement {
         requestAnimationFrame(this.loop.bind(this));
     }
 
+}
+
+function sliceLine(line, maxLength) {
+    const parts = [];
+
+    line = line.split("");
+
+    while(line.length > maxLength) {
+        const temp = line.splice(0, maxLength);
+        parts.push(temp.join(""));
+    }
+    parts.push(line.join(""));
+
+    return parts;
 }
 
 customElements.define('gyro-terminal', Terminal);
