@@ -260,59 +260,60 @@ export default class Terminal extends HTMLElement {
     }
 
     handleInput(e) {
-        if(!inputEnabled) return;
         let key = e.key;
         const shift = e.shiftKey;
         const ctrl = e.ctrlKey;
 
-        if(key == "Enter") {
-            this.write('\r');
-        }
-        if(key == "ArrowUp") {
-            historyCursor = Math.min(historyCursor + 1, history.length-1);
-            if(history[historyCursor]) {
-                this.replaceInput(history[historyCursor]);
+        if(inputEnabled) {
+            if(key == "Enter") {
+                this.write('\r');
             }
-        }
-        if(key == "ArrowDown") {
-            historyCursor = Math.max(historyCursor - 1, 0);
-            if(history[historyCursor]) {
-                this.replaceInput(history[historyCursor]);
+            if(key == "ArrowUp") {
+                historyCursor = Math.min(historyCursor + 1, history.length-1);
+                if(history[historyCursor]) {
+                    this.replaceInput(history[historyCursor]);
+                }
             }
-        }
-        if(key == "ArrowLeft") {
-            cursor[0] = Math.max(cursor[0]-1, Math.max(prefix.length, 0));
-        }
-        if(key == "ArrowRight") {
-            cursor[0] = Math.min(cursor[0]+1, buffer[buffer.length-1].length);
-        }
-        if(key == "Escape") {
-            this.cancelInput();
-        }
-        if(key == "End") {
-            cursor[0] = buffer[buffer.length-1].length;
-        }
-        if(key == "Home") {
-            cursor[0] = Math.max(prefix.length, 0);
-        }
-        if(key == "Backspace") {
-            if(cursor[0] > 0 && cursor[0] > prefix.length) {
-                const temp = buffer[buffer.length-1].split("").slice(0, cursor[0]-1);
-                const tail = buffer[buffer.length-1].split("").slice(cursor[0]);
+            if(key == "ArrowDown") {
+                historyCursor = Math.max(historyCursor - 1, 0);
+                if(history[historyCursor]) {
+                    this.replaceInput(history[historyCursor]);
+                }
+            }
+            if(key == "ArrowLeft") {
+                cursor[0] = Math.max(cursor[0]-1, Math.max(prefix.length, 0));
+            }
+            if(key == "ArrowRight") {
+                cursor[0] = Math.min(cursor[0]+1, buffer[buffer.length-1].length);
+            }
+            if(key == "Escape") {
+                this.cancelInput();
+            }
+            if(key == "End") {
+                cursor[0] = buffer[buffer.length-1].length;
+            }
+            if(key == "Home") {
+                cursor[0] = Math.max(prefix.length, 0);
+            }
+            if(key == "Backspace") {
+                if(cursor[0] > 0 && cursor[0] > prefix.length) {
+                    const temp = buffer[buffer.length-1].split("").slice(0, cursor[0]-1);
+                    const tail = buffer[buffer.length-1].split("").slice(cursor[0]);
+                    temp.push(...tail);
+                    buffer[buffer.length-1] = temp.join("");
+                    cursor[0]--;
+                }
+            }
+            if(key == "Delete") {
+                const temp = buffer[buffer.length-1].split("").slice(0, cursor[0]);
+                const tail = buffer[buffer.length-1].split("").slice(cursor[0]+1);
                 temp.push(...tail);
                 buffer[buffer.length-1] = temp.join("");
-                cursor[0]--;
             }
-        }
-        if(key == "Delete") {
-            const temp = buffer[buffer.length-1].split("").slice(0, cursor[0]);
-            const tail = buffer[buffer.length-1].split("").slice(cursor[0]+1);
-            temp.push(...tail);
-            buffer[buffer.length-1] = temp.join("");
-        }
-
-        if(VALID_CHARS.indexOf(key) != -1 && !ctrl) {
-            this.write(key);
+    
+            if(VALID_CHARS.indexOf(key) != -1 && !ctrl) {
+                this.write(key);
+            }
         }
 
         if(ctrl) {

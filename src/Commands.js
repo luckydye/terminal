@@ -29,7 +29,7 @@ export default {
             }
 
             terminal.addEventListener('shortcut', e => {
-                if(e.key == "c") cancel();
+                if(e.key.toLocaleLowerCase() == "c") cancel();
             })
 
             const draw = () => {
