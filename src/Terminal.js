@@ -7,6 +7,7 @@ const CURSOR_HEIGHT = 16;
 const CURSOR_WIDTH = 6;
 const VALID_CHARS = ` ~{}=<>^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ()[]-.,_:;#+'*/&%$§!?€1234567890"`;
 const LINE_PADDING = 3;
+const LINE_WRAPPING = false;
 
 let CHAR_WIDTH = 7.69;
 let CHAR_HEIGHT = 12;
@@ -376,7 +377,7 @@ export default class Terminal extends HTMLElement {
         for(let i = 0; i < cursor[1]; i++) {
             const line = buffer[i];
             const text = context.measureText(line);
-            if(max_line_px_length - text.width < 0) {
+            if(max_line_px_length - text.width < 0 && LINE_WRAPPING) {
                 const parts = sliceLine(line, max_line_px_length / CHAR_WIDTH);
                 for(let part of parts) {
                     posY++;
@@ -406,7 +407,7 @@ export default class Terminal extends HTMLElement {
 
         for(let line of buffer) {
             const text = context.measureText(line);
-            if(max_line_px_length - text.width < 0) {
+            if(max_line_px_length - text.width < 0 && LINE_WRAPPING) {
                 const parts = sliceLine(line, max_line_px_length / CHAR_WIDTH);
                 for(let part of parts) {
                     drawLine(part);
