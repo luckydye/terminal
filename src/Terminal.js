@@ -89,7 +89,7 @@ export default class Terminal extends HTMLElement {
             const dir = Math.sign(e.deltaY);
             const lineHeight = CHAR_HEIGHT + LINE_PADDING;
 
-            const cursorY = BORDER_PADDING[1] + (cursor[1] * CHAR_HEIGHT) + (cursor[1] * LINE_PADDING);
+            const cursorY = this.getCursorPosition()[1];
             const maxY = Math.max(0, cursorY - (canvas.height - (lineHeight * 3)));
 
             view[1] = Math.max(0, Math.min(maxY, view[1] + dir * lineHeight));
@@ -264,7 +264,7 @@ export default class Terminal extends HTMLElement {
         }
 
         const lineHeight = CHAR_HEIGHT + LINE_PADDING;
-        const cursorY = BORDER_PADDING[1] + (cursor[1] * CHAR_HEIGHT) + (cursor[1] * LINE_PADDING);
+        const cursorY = this.getCursorPosition()[1];
         view[1] = Math.max(0, cursorY - (canvas.height - (lineHeight * 3)));
     }
 
@@ -374,7 +374,7 @@ export default class Terminal extends HTMLElement {
             const pos = this.getCursorPosition();
 
             context.fillStyle = FONT_COLOR;
-            context.fillRect(pos[0], pos[1], CURSOR_WIDTH, CURSOR_HEIGHT);
+            context.fillRect(pos[0], pos[1] - view[1], CURSOR_WIDTH, CURSOR_HEIGHT);
         }
     }
 
@@ -401,7 +401,7 @@ export default class Terminal extends HTMLElement {
 
         const lineHeight = CHAR_HEIGHT + LINE_PADDING;
         const x = BORDER_PADDING[0] + (cursor[0] * CHAR_WIDTH);
-        const y = BORDER_PADDING[1] + (posY * CHAR_HEIGHT) + (posY * LINE_PADDING) + (CHAR_HEIGHT / 2) - (CURSOR_HEIGHT / 2) - view[1];
+        const y = BORDER_PADDING[1] + (posY * CHAR_HEIGHT) + (posY * LINE_PADDING) + (CHAR_HEIGHT / 2) - (CURSOR_HEIGHT / 2);
 
         return [x + CURSOR_OFFSET[0], y + CURSOR_OFFSET[1]];
     }

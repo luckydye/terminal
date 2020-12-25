@@ -13,7 +13,9 @@ export default class Console {
     }
 
     static async fetchModule(path) {
-        const module = await fetchModule(path)
+        const raw = await fetch(path).then(res => res.text());
+        const base64 = "data:application/javascript;base64," + btoa(raw);
+        const module = await fetchModule(base64);
         module.origin = path;
         return module;
     }
