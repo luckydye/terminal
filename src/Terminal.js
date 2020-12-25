@@ -7,8 +7,8 @@ const CURSOR_HEIGHT = 16;
 const CURSOR_WIDTH = 6;
 const VALID_CHARS = ` ~{}=<>^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ()[]-.,_:;#+'*/&%$§!?€1234567890"`;
 const LINE_PADDING = 3;
-const LINE_WRAPPING = false;
 
+let LINE_WRAPPING = true;
 let CHAR_WIDTH = 7.69;
 let CHAR_HEIGHT = 12;
 
@@ -168,6 +168,14 @@ export default class Terminal extends HTMLElement {
 
     enableInput() {
         this.inputEnabled = true;
+    }
+
+    disableLineWrapping() {
+        LINE_WRAPPING = false;
+    }
+
+    enableLineWrapping() {
+        LINE_WRAPPING = true;
     }
 
     handleSubmit(line) {

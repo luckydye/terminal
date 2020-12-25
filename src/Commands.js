@@ -1,18 +1,18 @@
-import { simulateWrite, sleep, print, getTerminal, getSocket } from './Console.js';
+import Console from './Console.js';
 
 export default {
 
     help(args) {
-        print("\nNo help needed :)\n");
+        Console.print("\nNo help needed :)\n");
     },
 
     prefix(args) {
-        const terminal = getTerminal();
-        print(terminal.prefix);
+        const terminal = Console.getTerminal();
+        Console.print(terminal.prefix);
     },
 
     clear(args) {
-        const terminal = getTerminal();
+        const terminal = Console.getTerminal();
         terminal.clear();
     },
 
@@ -21,12 +21,12 @@ export default {
     },
 
     list() {
-        print(`Commands: ${Object.keys(this).join(", ")}`);
+        Console.print(`Commands: ${Object.keys(this).join(", ")}`);
     },
 
     test(args) {
         return new Promise((resolve) => {
-            const terminal = getTerminal();
+            const terminal = Console.getTerminal();
             let running = true;
 
             terminal.disableInput();
@@ -62,18 +62,18 @@ export default {
     },
 
     async chat(args) {
-        const ws = getSocket();
+        const ws = Console.getSocket();
         const id = args[0];
 
         if(id == "" || !id) {
-            print("Please provide a chat id to connect to");
+            Console.print("Please provide a chat id to connect to");
             return;
         }
 
-        const terminal = getTerminal();
+        const terminal = Console.getTerminal();
         terminal.setPrefix("");
         terminal.disableInput();
-        await simulateWrite('Connecting to chat...', 10);
+        await Console.simulateWrite('Connecting to chat...', 10);
 
         terminal.newline();
         terminal.newline();
@@ -108,24 +108,24 @@ export default {
     },
 
     // connections(args) {
-    //     const terminal = getTerminal();
+    //     const terminal = Console.getTerminal();
     //     terminal.disableInput();
     //     terminal.setPrefix("");
 
     //     return fetch('/connections')
     //     .then(res => res.json())
     //     .then(async json => {
-    //         await simulateWrite(`\nActive connections: ${json.data}\n\n`, 12);
+    //         await Console.simulateWrite(`\nActive connections: ${json.data}\n\n`, 12);
     //     })
     // },
 
     exit(args) {
         return new Promise((resolve) => {
-            const terminal = getTerminal();
+            const terminal = Console.getTerminal();
             terminal.setPrefix("");
             terminal.disableInput();
             terminal.clear();
-            print("Bye.");
+            Console.print("Bye.");
 
             setTimeout(() => window.close(), 1000);
         })

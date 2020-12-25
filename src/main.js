@@ -1,46 +1,47 @@
 import './Terminal.js';
 import commands from './Commands.js';
-import { simulateWrite, sleep, print, getTerminal, connectToWebSocket } from './Console.js';
+import Console from './Console.js';
 
 const PREROLL = `
 
-@@@@@@            .@@@@@@@@@@@@@@@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@      
-@@@@@@@@,               /@@@.                        @@@(                 
-@@@@  @@@@#             /@@@.                        @@@(                 
-@@@@    @@@@@@@@@       /@@@.     @@@@@@@@@@@&       @@@(                 
-@@@@      @@@@@         /@@@.                        @@@(                 
-(@@@        %           /@@@.                        @@@(                 
-  .@                    /@@@.     @@@@@@@@@@@@@      @@@@@@@@@@@@@@@/     
+@@@@@@            .@@@@@@@@@@@@@@@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@ 
+@@@@@@@@,               /@@@.                        @@@(            
+@@@@  @@@@#             /@@@.                        @@@(            
+@@@@    @@@@@@@@@       /@@@.     @@@@@@@@@@@&       @@@(            
+@@@@      @@@@@         /@@@.                        @@@(            
+(@@@        %           /@@@.                        @@@(            
+  .@                    /@@@.     @@@@@@@@@@@@@      @@@@@@@@@@@@@@@/
 
 `;
 const INPUT_PREFIX = "terminal@52.59.209.57:~$ ";
 
 let idle = true;
 
+const terminal = Console.getTerminal();
+terminal.disableInput();
+mainEle.appendChild(terminal);
+
 setTimeout(async () => {
-    const terminal = getTerminal();
+    const terminal = Console.getTerminal();
     
-    await print(PREROLL);
-    await sleep(200);
-    await simulateWrite("Starting up", 12);
-    await simulateWrite("... ", 250);
-    await print("[OK]");
-
-    await print("\nLorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s\n");
-
-    await sleep(200);
-    await simulateWrite("Connecting to Interface\0.\0.\0.", 24);
-    await simulateWrite("\0\0\0\0", 12);
+    await Console.print(PREROLL);
+    await Console.sleep(200);
+    await Console.simulateWrite("Starting up", 12);
+    await Console.simulateWrite("... ", 250);
+    await Console.print("[OK]");
+    await Console.sleep(200);
+    await Console.simulateWrite("Connecting to Interface\0.\0.\0.", 24);
+    await Console.simulateWrite("\0\0\0\0", 12);
     
-    const ws = connectToWebSocket(async () => {
-        print("");
+    const ws = Console.connectToWebSocket(async () => {
+        Console.print("");
 
         while(true) {
             const value = await terminal.read(INPUT_PREFIX);
             const args = value.split(" ");
             await handleInput(args).catch(err => {
                 console.error(err);
-                print(`\n[Internal Error]: ${err.message}\n`);
+                Console.print(`\n[Internal Error]: ${err.message}\n`);
             });
         }
     });
@@ -49,14 +50,14 @@ setTimeout(async () => {
         if(args[0] != "") {
             if(commands[args[0]]) {
                 idle = false;
-                const exit = await commands[args[0]](args.slice(1));
+                const exit = await commands[args[0]](args.slice(1), Console);
                 if(exit !== 0 && exit != undefined) {
-                    print("\nProcess exited.\n");
+                    Console.print("\nProcess exited.\n");
                 }
                 terminal.read(INPUT_PREFIX);
                 idle = true;
             } else {
-                print(`\nCommand "${args[0]}" not found.\n`);
+                Console.print(`\nCommand "${args[0]}" not found.\n`);
             }
         }
     }
@@ -67,4 +68,4 @@ setTimeout(async () => {
         });
     })
 
-}, 500);
+}, 200);
