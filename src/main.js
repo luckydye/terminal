@@ -29,30 +29,35 @@ setTimeout(async () => {
     await simulateWrite("Connecting to Interface\0.\0.\0.", 24);
     await simulateWrite("\0\0\0\0", 12);
     
-    const ws = connectToWebSocket(() => {
+    const ws = connectToWebSocket(async () => {
         print("");
-        terminal.read(INPUT_PREFIX);
-    });
 
-    terminal.addEventListener('submit', async e => {
-        if(idle) {
-            const args = e.value.split(" ");
-            if(args[0] != "") {
-                if(commands[args[0]]) {
-                    idle = false;
-                    const exit = await commands[args[0]](args.slice(1));
-                    if(exit !== 0 && exit != undefined) {
-                        print("\nProcess exited.\n");
-                    }
-                    terminal.read(INPUT_PREFIX);
-                    idle = true;
-                } else {
-                    ws.send(e.value);
-                    print(`\nCommand "${args[0]}" not found.\n`);
-                }
-            }
+        while(true) {
+            const value = await terminal.read(INPUT_PREFIX);
+            const args = value.split(" ");
+            await handleInput(args).catch(err => {
+                console.error(err);
+                print(`\n[Internal Error]: ${err.message}\n`);
+            });
         }
     });
+
+    async function handleInput(args) {
+        if(args[0] != "") {
+            if(commands[args[0]]) {
+                idle = false;
+                const exit = await commands[args[0]](args.slice(1));
+                if(exit !== 0 && exit != undefined) {
+                    print("\nProcess exited.\n");
+                }
+                terminal.read(INPUT_PREFIX);
+                idle = true;
+            } else {
+                ws.send(args);
+                print(`\nCommand "${args[0]}" not found.\n`);
+            }
+        }
+    }
 
     window.addEventListener('paste', e => {
         e.clipboardData.items[0].getAsString(str => {

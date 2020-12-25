@@ -172,7 +172,6 @@ export default class Terminal extends HTMLElement {
         }
         this.pushToHistory(line);
         this.dispatchEvent(new SubmitEvent(line));
-        this.write(this.prefix);
     }
 
     pushToHistory(input) {
@@ -340,7 +339,7 @@ export default class Terminal extends HTMLElement {
 
         this.drawBuffer();
 
-        if(inputEnabled) {
+        if(this.inputEnabled) {
             this.drawCursor();
         }
     }

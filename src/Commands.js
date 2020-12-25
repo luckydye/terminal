@@ -32,12 +32,7 @@ export default {
 
         terminal.newline();
         terminal.newline();
-        terminal.setPrefix("");
         const username = await terminal.read("Username: ");
-        print("\n__");
-        terminal.setPrefix("");
-        await simulateWrite('Your username: ' + username, 10);
-
         terminal.newline();
 
         while(true) {
@@ -63,25 +58,15 @@ export default {
     },
 
     exit(args) {
-        const terminal = getTerminal();
-        terminal.setPrefix("");
-        terminal.disableInput();
-        terminal.clear();
-        print("Bye. 3");
+        return new Promise((resolve) => {
+            const terminal = getTerminal();
+            terminal.setPrefix("");
+            terminal.disableInput();
+            terminal.clear();
+            print("Bye.");
 
-        setTimeout(() => {
-            terminal.clear();
-            print("Bye. 2");
-        }, 1000);
-        setTimeout(() => {
-            terminal.clear();
-            print("Bye. 1");
-        }, 2000);
-        setTimeout(() => {
-            terminal.clear();
-            print("Bye. 0");
-            window.close();
-        }, 3000);
+            setTimeout(() => window.close(), 1000);
+        })
     }
 
 }
