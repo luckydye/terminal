@@ -177,7 +177,7 @@ export default class Terminal extends HTMLElement {
             const currLine = buffer[buffer.length-1];
             this.inputEnabled = true;
             this.prefix = newPrefix || currLine;
-            if(newPrefix) {
+            if(newPrefix && currLine !== newPrefix) {
                 this.write(newPrefix);
             }
 
@@ -202,9 +202,6 @@ export default class Terminal extends HTMLElement {
         switch(str) {
             case "\0":
                     // nothing (sleep)
-                break;
-            case "\t":
-                    this.read();
                 break;
             case "\r":
                     const currLine = this.newline();
@@ -279,7 +276,13 @@ export default class Terminal extends HTMLElement {
         }
 
         if(ctrl) {
+            e.preventDefault();
+            e.stopPropagation();
             this.dispatchEvent(new ShortcutEvent(key));
+
+            if(VALID_CHARS.indexOf(key) != -1) {
+                this.dispatchEvent(new SubmitEvent("^" + key));
+            }
         }
     }
 

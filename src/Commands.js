@@ -1,7 +1,4 @@
 import { simulateWrite, sleep, print, getTerminal } from './Console.js';
-import chat from './Programm.js';
-
-export const INPUT_PREFIX = "terminal@52.59.209.57:~$ ";
 
 export default {
 
@@ -9,12 +6,47 @@ export default {
         print("\nNo help needed :)\n");
     },
 
+    prefix(args) {
+        const terminal = getTerminal();
+        print(terminal.prefix);
+    },
+
     clear(args) {
         const terminal = getTerminal();
         terminal.clear();
     },
 
-    chat: chat,
+    async chat(args) {
+        const id = args[0];
+
+        if(id == "" || !id) {
+            print("Please provide a chat id to connect to");
+            return;
+        }
+
+        const terminal = getTerminal();
+        terminal.setPrefix("");
+        terminal.disableInput();
+        await simulateWrite('Connecting to chat...', 10);
+
+        terminal.newline();
+        terminal.newline();
+        terminal.setPrefix("");
+        const username = await terminal.read("Username: ");
+        print("\n__");
+        terminal.setPrefix("");
+        await simulateWrite('Your username: ' + username, 10);
+
+        terminal.newline();
+
+        while(true) {
+            const input = await terminal.read("> ");
+            if(input.toLocaleLowerCase() == "^c") {
+                return 1;
+                break;
+            }
+        }
+    },
 
     connections(args) {
         const terminal = getTerminal();
@@ -25,7 +57,6 @@ export default {
         .then(res => res.json())
         .then(async json => {
             await simulateWrite(`\nActive connections: ${json.data}\n\n`, 12);
-            terminal.read(INPUT_PREFIX);
         })
     },
 

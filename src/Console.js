@@ -1,15 +1,13 @@
-import { INPUT_PREFIX } from "./Commands.js";
-
 const terminal = document.createElement('gyro-terminal');
 terminal.disableInput();
 mainEle.appendChild(terminal);
 
-export function connectToWebSocket() {
+export function connectToWebSocket(callback = () => {}) {
     const ws = new WebSocket(location.origin.replace("https", "wss").replace("http", "ws"));
 
     ws.onopen = function (event) {
         print('\nConnection established.');
-        simulateWrite("\n"+INPUT_PREFIX+"\t", 0);
+        callback();
     };
 
     ws.onmessage = function incoming(msg) {
