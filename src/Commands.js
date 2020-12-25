@@ -1,4 +1,4 @@
-import { simulateWrite, sleep, print, getTerminal } from './Console.js';
+import { simulateWrite, sleep, print, getTerminal, getSocket } from './Console.js';
 
 export default {
 
@@ -17,6 +17,7 @@ export default {
     },
 
     async chat(args) {
+        const ws = getSocket();
         const id = args[0];
 
         if(id == "" || !id) {
@@ -41,6 +42,7 @@ export default {
 
         while(true) {
             const input = await terminal.read("> ");
+            console.log(input);
             if(input.toLocaleLowerCase() == "^c") {
                 return 1;
                 break;

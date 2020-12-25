@@ -26,6 +26,8 @@ let view = [0, 0];
 let prefix = "";
 let inputEnabled = true;
 let hideOutput = false;
+let history = [];
+let historyCursor = -1;
 
 class SubmitEvent extends Event {
     constructor(value) {
@@ -168,8 +170,26 @@ export default class Terminal extends HTMLElement {
         } else {
             line = line.slice(this.prefix.length);
         }
+        this.pushToHistory(line);
         this.dispatchEvent(new SubmitEvent(line));
         this.write(this.prefix);
+    }
+
+    pushToHistory(input) {
+        if(input != "") {
+            history.unshift(input);
+        }
+        historyCursor = -1;
+    }
+
+    cancelInput() {
+        buffer[cursor[1]] = this.prefix;
+        this.setCursor(buffer[cursor[1]].length);
+    }
+
+    replaceInput(str) {
+        this.cancelInput();
+        this.write(str);
     }
 
     read(newPrefix) {
@@ -243,11 +263,26 @@ export default class Terminal extends HTMLElement {
         if(key == "Enter") {
             this.write('\r');
         }
+        if(key == "ArrowUp") {
+            historyCursor = Math.min(historyCursor + 1, history.length-1);
+            if(history[historyCursor]) {
+                this.replaceInput(history[historyCursor]);
+            }
+        }
+        if(key == "ArrowDown") {
+            historyCursor = Math.max(historyCursor - 1, 0);
+            if(history[historyCursor]) {
+                this.replaceInput(history[historyCursor]);
+            }
+        }
         if(key == "ArrowLeft") {
             cursor[0] = Math.max(cursor[0]-1, Math.max(prefix.length, 0));
         }
         if(key == "ArrowRight") {
             cursor[0] = Math.min(cursor[0]+1, buffer[buffer.length-1].length);
+        }
+        if(key == "Escape") {
+            this.cancelInput();
         }
         if(key == "End") {
             cursor[0] = buffer[buffer.length-1].length;
@@ -314,13 +349,19 @@ export default class Terminal extends HTMLElement {
         const ts = Date.now() / 500;
 
         if(ts % 2 > 1) {
-            const lineHeight = CHAR_HEIGHT + LINE_PADDING;
-            const x = BORDER_PADDING[0] + (cursor[0] * CHAR_WIDTH);
-            const y = BORDER_PADDING[1] + (cursor[1] * CHAR_HEIGHT) + (cursor[1] * LINE_PADDING) + (CHAR_HEIGHT / 2) - (CURSOR_HEIGHT / 2) - view[1];
+            const pos = this.getCursorPosition();
 
             context.fillStyle = FONT_COLOR;
-            context.fillRect(x + CURSOR_OFFSET[0], y + CURSOR_OFFSET[1], CURSOR_WIDTH, CURSOR_HEIGHT);
+            context.fillRect(pos[0], pos[1], CURSOR_WIDTH, CURSOR_HEIGHT);
         }
+    }
+
+    getCursorPosition() {
+        const lineHeight = CHAR_HEIGHT + LINE_PADDING;
+        const x = BORDER_PADDING[0] + (cursor[0] * CHAR_WIDTH);
+        const y = BORDER_PADDING[1] + (cursor[1] * CHAR_HEIGHT) + (cursor[1] * LINE_PADDING) + (CHAR_HEIGHT / 2) - (CURSOR_HEIGHT / 2) - view[1];
+
+        return [x + CURSOR_OFFSET[0], y + CURSOR_OFFSET[1]];
     }
 
     drawBuffer() {

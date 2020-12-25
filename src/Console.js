@@ -2,8 +2,10 @@ const terminal = document.createElement('gyro-terminal');
 terminal.disableInput();
 mainEle.appendChild(terminal);
 
+let ws;
+
 export function connectToWebSocket(callback = () => {}) {
-    const ws = new WebSocket(location.origin.replace("https", "wss").replace("http", "ws"));
+    ws = new WebSocket(location.origin.replace("https", "wss").replace("http", "ws"));
 
     ws.onopen = function (event) {
         print('\nConnection established.');
@@ -17,6 +19,10 @@ export function connectToWebSocket(callback = () => {}) {
         terminal.append(terminal.cursor[1], str);
     };
 
+    return ws;
+}
+
+export function getSocket() {
     return ws;
 }
 
