@@ -46,8 +46,8 @@ wss.on('connection', socket => {
                 broadcast(roomId, JSON.stringify({
                     type: 'message',
                     data: {
-                        text: escape(text),
-                        username: escape(username),
+                        text: text,
+                        username: username,
                     }
                 }));
                 break;
@@ -61,7 +61,7 @@ wss.on('connection', socket => {
                 broadcast(roomId, JSON.stringify({
                     type: 'left',
                     data: {
-                        username: escape(username),
+                        username: username,
                     }
                 }));
                 break;
