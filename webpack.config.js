@@ -17,9 +17,6 @@ module.exports = {
         rules: [
             {
                 test: /\.js$/,
-                exclude: [ 
-                    path.resolve(__dirname, 'excluded_file_name.js') 
-                ],
                 enforce: 'post',
                 use: { 
                     loader: WebpackObfuscator.loader, 

@@ -7,6 +7,15 @@
     <title>Terminal</title>
 
     <link rel="stylesheet" href="/statc/main.css">
+    
+    <script>
+        function fetchModule(path) {
+            return import(path).then(res => {
+                const { default: module } = res;
+                return module;
+            })
+        }
+    </script>
 </head>
 <body>
     <main id="mainEle"></main>

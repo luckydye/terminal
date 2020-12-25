@@ -326,12 +326,16 @@ export default class Terminal extends HTMLElement {
         }
 
         if(ctrl) {
-            e.preventDefault();
-            e.stopPropagation();
-            this.dispatchEvent(new ShortcutEvent(key));
+            const ev = new ShortcutEvent(key);
+            const canceld = this.dispatchEvent(ev);
 
-            if(VALID_CHARS.indexOf(key) != -1) {
-                this.dispatchEvent(new SubmitEvent("^" + key));
+            if(!canceld) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if(VALID_CHARS.indexOf(key) != -1) {
+                    this.dispatchEvent(new SubmitEvent("^" + key));
+                }
             }
         }
     }
@@ -406,11 +410,11 @@ export default class Terminal extends HTMLElement {
         const max_line_px_length = this.getMaxBufferWidth();
 
         let x = BORDER_PADDING[0];
-        let y = BORDER_PADDING[1];
+        let y = BORDER_PADDING[1] - view[1];
 
         const drawLine = (line) => {
             context.fillText(line, x, y);
-            y += CHAR_HEIGHT + LINE_PADDING - view[1];
+            y += CHAR_HEIGHT + LINE_PADDING;
         }
 
         for(let line of buffer) {

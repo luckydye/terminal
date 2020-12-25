@@ -1,6 +1,7 @@
-import './Terminal.js';
 import commands from './Commands.js';
 import Console from './Console.js';
+import ConsoleModule from './ConsoleModule.js';
+import TestModule from './modules/test-module.js';
 
 const PREROLL = `
 
@@ -15,6 +16,12 @@ const PREROLL = `
 `;
 const INPUT_PREFIX = "terminal@52.59.209.57:~$ ";
 
+const nativeModules = [
+    '/statc/lib/minimal-module.js',
+    '/statc/lib/chat-module.js',
+    TestModule
+]
+
 let idle = true;
 
 const terminal = Console.getTerminal();
@@ -28,13 +35,27 @@ setTimeout(async () => {
     await Console.sleep(200);
     await Console.simulateWrite("Starting up", 12);
     await Console.simulateWrite("... ", 250);
-    await Console.print("[OK]");
+    Console.print("[OK]\n");
+
+    for(let modulePath of nativeModules) {
+        let module = modulePath;
+        if(typeof module === "string") {
+            module = await Console.fetchModule(modulePath).catch(err => {
+                Console.print("[Error] " + err.message);
+            })
+        }
+        await Console.installModule(module);
+    }
+    Console.print("");
+
     await Console.sleep(200);
     await Console.simulateWrite("Connecting to Interface\0.\0.\0.", 24);
     await Console.simulateWrite("\0\0\0\0", 12);
     
     const ws = Console.connectToWebSocket(async () => {
+        Console.print('\nConnection established.');
         Console.print("");
+        await Console.sleep(200);
 
         while(true) {
             const value = await terminal.read(INPUT_PREFIX);
@@ -50,7 +71,7 @@ setTimeout(async () => {
         if(args[0] != "") {
             if(commands[args[0]]) {
                 idle = false;
-                const exit = await commands[args[0]](args.slice(1), Console);
+                const exit = await commands[args[0]](args.slice(1));
                 if(exit !== 0 && exit != undefined) {
                     Console.print("\nProcess exited.\n");
                 }
@@ -61,6 +82,14 @@ setTimeout(async () => {
             }
         }
     }
+
+    terminal.addEventListener('shortcut', e => {
+        if(e.key == "r") {
+            location.reload();
+        } else if(e.key == "v") {
+            e.preventDefault();
+        }
+    });
 
     window.addEventListener('paste', e => {
         e.clipboardData.items[0].getAsString(str => {

@@ -1,14 +1,47 @@
-const terminal = document.createElement('gyro-terminal');
+import commands from './Commands.js';
+import Terminal from './Terminal.js';
+
+const terminal = new Terminal();
 
 let ws;
+let modules = new Map();
 
 export default class Console {
+
+    static getModules() {
+        return modules;
+    }
+
+    static async fetchModule(path) {
+        const module = await fetchModule(path)
+        module.origin = path;
+        return module;
+    }
+
+    static async installModule(module) {
+        try {
+            if(module.install) {
+                const name = module.moduleName || module.origin;
+                modules.set(name, module);
+                module.install(Console);
+
+                Console.print(`[Module] Installed module '${name}'`);
+    
+                if(module.commandName) {
+                    commands[module.commandName] = module.run;
+                }
+            } else {
+                throw new Error(`Missing install method in module: ${path}`);
+            }
+        } catch(err) {
+            Console.print("[Error] " + err.message);
+        }
+    }
 
     static connectToWebSocket(callback = () => {}) {
         ws = new WebSocket(location.origin.replace("https", "wss").replace("http", "ws"));
     
         ws.onopen = (event) => {
-            this.print('\nConnection established.');
             callback();
         };
     
