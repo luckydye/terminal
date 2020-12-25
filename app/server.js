@@ -3,25 +3,70 @@ const express = require('express');
 const ws = require('ws');
 const port = 3000;
 
-const connections = [];
+const rooms = new Map();
 
-function broadcast(msg) {
-    for (let ws of connections) {
-        ws.send(msg);
+function broadcast(roomId, msg) {
+    const room = getRoom(roomId);
+    const closedSockets = [];
+    for (let ws of room) {
+        if(ws.readyState === 1) {
+            ws.send(msg);
+        } else {
+            closedSockets.push(ws);
+        }
     }
+    for(let ws of closedSockets) {
+        room.delete(ws);
+    }
+}
+
+function getRoom(id) {
+    if(!rooms.has(id)) {
+        rooms.set(id, new Set());
+    }
+    return rooms.get(id);
 }
 
 const app = express();
 
 const wss = new ws.Server({ noServer: true });
 wss.on('connection', socket => {
-    socket.isAlive = true;
-    socket.on('pong', heartbeat);
-
-    connections.push(socket);
-
     socket.on('message', message => {
-        // broadcast(message);
+        const msg = JSON.parse(message);
+        const type = msg.type;
+
+        switch(type) {
+            case "chat": {
+                const username = msg.data.username;
+                const roomId = msg.data.room;
+                const text = msg.data.message;
+                const room = getRoom(roomId);
+
+                room.add(socket);
+                broadcast(roomId, JSON.stringify({
+                    type: 'message',
+                    data: {
+                        text: escape(text),
+                        username: escape(username),
+                    }
+                }));
+                break;
+            }
+            case "leave": {
+                const username = msg.data.username;
+                const roomId = msg.data.room;
+                const room = getRoom(roomId);
+
+                room.delete(socket);
+                broadcast(roomId, JSON.stringify({
+                    type: 'left',
+                    data: {
+                        username: escape(username),
+                    }
+                }));
+                break;
+            }
+        }
     });
 
     socket.on('disconnect', message => {
@@ -29,29 +74,10 @@ wss.on('connection', socket => {
     });
 });
 
-function noop() {}
-
-function heartbeat() {
-  this.isAlive = true;
-}
-
-const interval = setInterval(function ping() {
-    wss.clients.forEach(function each(ws) {
-        if (ws.isAlive === false) return ws.terminate();
-
-        ws.isAlive = false;
-        ws.ping(noop);
-    });
-}, 30000);
-
-wss.on('close', function close() {
-    clearInterval(interval);
-});
-
 app.use('/statc', express.static(path.join(__dirname, '../public')));
-app.get('/connections', (req, res) => {
-    res.send(JSON.stringify({ data: connections.length }));
-});
+// app.get('/connections', (req, res) => {
+//     res.send(JSON.stringify({ data: connections.length }));
+// });
 app.use('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
 });

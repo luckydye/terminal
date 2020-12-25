@@ -13,10 +13,17 @@ export function connectToWebSocket(callback = () => {}) {
     };
 
     ws.onmessage = function incoming(msg) {
-        console.log(msg);
+        const data = JSON.parse(msg.data);
         
-        const str = "User: " + msg.data + "\n";
-        terminal.append(terminal.cursor[1], str);
+        if(data.type == "message") {
+            const str = `${data.data.username}: ${data.data.text}`;
+            terminal.append(terminal.cursor[1], str);
+        }
+        
+        if(data.type == "left") {
+            const str = `${data.data.username} left the room.`;
+            terminal.append(terminal.cursor[1], str);
+        }
     };
 
     return ws;

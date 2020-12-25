@@ -53,7 +53,6 @@ setTimeout(async () => {
                 terminal.read(INPUT_PREFIX);
                 idle = true;
             } else {
-                ws.send(args);
                 print(`\nCommand "${args[0]}" not found.\n`);
             }
         }
