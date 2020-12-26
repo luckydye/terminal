@@ -6,7 +6,20 @@ const terminal = new Terminal();
 let ws;
 let modules = new Map();
 
+const MODULE_REGISTRY_ID = "modules";
+
 export default class Console {
+    
+    static async loadModules() {
+        const moduleRegistry = localStorage.getItem(MODULE_REGISTRY_ID);
+        if(moduleRegistry) {
+            const registry = JSON.parse(moduleRegistry);
+            for(let modulePath of registry.modules) {
+                const module = await Console.fetchModule(modulePath);
+                Console.installModule(module);
+            }
+        }
+    }
 
     static getModules() {
         return modules;
@@ -17,16 +30,29 @@ export default class Console {
         const base64 = "data:application/javascript;base64," + btoa(raw);
         const module = await fetchModule(base64);
         module.origin = path;
+
+        // register module in localstorage
+        let moduleRegistry = localStorage.getItem(MODULE_REGISTRY_ID);
+        if(!moduleRegistry) {
+            moduleRegistry = '{ "modules": [] }';
+        }
+        const registry = JSON.parse(moduleRegistry);
+        if(registry.modules.indexOf(module.origin) === -1) {
+            registry.modules.push(module.origin);
+        }
+        localStorage.setItem(MODULE_REGISTRY_ID, JSON.stringify(registry));
+
         return module;
     }
 
     static async installModule(module) {
-        // TODO:
-        // Actually "install" them into local storage for reuse.
-        // Also make a "unsintsall" function/method.
+        const name = module.moduleName || module.origin;
+        if(modules.get(name)) {
+            Console.print(`[Module] Module '${name}' already installed.`);
+            return;
+        }
         try {
             if(module.install) {
-                const name = module.moduleName || module.origin;
                 modules.set(name, module);
                 module.install(Console);
 
@@ -40,6 +66,20 @@ export default class Console {
             }
         } catch(err) {
             Console.print("[Error] " + err.message);
+        }
+    }
+
+    static uninstallModule(moduleName) {
+        const module = modules.get(moduleName);
+        if(module) {
+            modules.delete(moduleName);
+            module.uninstall();
+            if(module.commandName) {
+                commands[module.commandName] = null;
+            }
+            Console.print(`[Module] Uninstalled module '${name}'`);
+        } else {
+            Console.print("Module not found.");
         }
     }
 

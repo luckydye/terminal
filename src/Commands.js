@@ -19,6 +19,14 @@ export default {
         }
     },
 
+    uninstall([ modulePath ]) {
+        if(modulePath) {
+            await Console.uninstallModule(modulePath);
+        } else {
+            Console.print("Provide a module name.");
+        }
+    },
+
     clear(args) {
         const terminal = Console.getTerminal();
         terminal.clear();

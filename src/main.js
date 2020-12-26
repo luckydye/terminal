@@ -33,8 +33,7 @@ setTimeout(async () => {
     
     await Console.print(PREROLL);
     await Console.sleep(100);
-    await Console.simulateWrite("Initializing", 4);
-    await Console.simulateWrite("...\n\n", 64);
+    await Console.simulateWrite("Initializing...\n\n", 4);
 
     for(let modulePath of nativeModules) {
         let module = modulePath;
@@ -45,6 +44,9 @@ setTimeout(async () => {
         }
         await Console.installModule(module);
     }
+    Console.print("");
+
+    await Console.loadModules();
     Console.print("");
 
     await Console.sleep(100);
