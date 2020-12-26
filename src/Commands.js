@@ -19,7 +19,7 @@ export default {
         }
     },
 
-    uninstall([ modulePath ]) {
+    async uninstall([ modulePath ]) {
         if(modulePath) {
             await Console.uninstallModule(modulePath);
         } else {
