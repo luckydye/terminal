@@ -97,4 +97,6 @@ setTimeout(async () => {
         });
     })
 
+    window.addEventListener('contextmenu', e => e.preventDefault());
+
 }, 200);
