@@ -19,7 +19,7 @@ const INPUT_PREFIX = "terminal@52.59.209.57:~$ ";
 const nativeModules = [
     '/statc/lib/minimal-module.js',
     '/statc/lib/chat-module.js',
-    TestModule
+    TestModule,
 ]
 
 let idle = true;
@@ -32,10 +32,9 @@ setTimeout(async () => {
     const terminal = Console.getTerminal();
     
     await Console.print(PREROLL);
-    await Console.sleep(200);
-    await Console.simulateWrite("Starting up", 12);
-    await Console.simulateWrite("... ", 250);
-    Console.print("[OK]\n");
+    await Console.sleep(100);
+    await Console.simulateWrite("Initializing", 4);
+    await Console.simulateWrite("...\n\n", 64);
 
     for(let modulePath of nativeModules) {
         let module = modulePath;
@@ -48,14 +47,13 @@ setTimeout(async () => {
     }
     Console.print("");
 
-    await Console.sleep(200);
-    await Console.simulateWrite("Connecting to Interface\0.\0.\0.", 24);
-    await Console.simulateWrite("\0\0\0\0", 12);
+    await Console.sleep(100);
+    await Console.print("Connecting to Interface...", 4);
     
     const ws = Console.connectToWebSocket(async () => {
-        Console.print('\nConnection established.');
+        Console.print('Connection established.');
         Console.print("");
-        await Console.sleep(200);
+        await Console.sleep(100);
 
         while(true) {
             const value = await terminal.read(INPUT_PREFIX);
