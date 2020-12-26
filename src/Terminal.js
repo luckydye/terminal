@@ -245,9 +245,6 @@ export default class Terminal extends HTMLElement {
                     this.newline();
                 break;
             default:
-                const text = context.measureText("M");
-                CHAR_WIDTH = text.width;
-            
                 const temp = buffer[cursor[1]].split("").slice(0, cursor[0]);
 
                 if(hideOutput) {
@@ -387,6 +384,9 @@ export default class Terminal extends HTMLElement {
     }
 
     getCursorPosition() {
+        const text = context.measureText("M");
+        CHAR_WIDTH = text.width;
+
         const max_line_px_length = this.getMaxBufferWidth();
 
         let posY = 0;

@@ -20,7 +20,7 @@ export default {
     },
 
     async uninstall([ modulePath ]) {
-        if(modulePath) {
+        if(modulePath && modulePath != "") {
             await Console.uninstallModule(modulePath);
         } else {
             Console.print("Provide a module name.");

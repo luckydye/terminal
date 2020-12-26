@@ -8,16 +8,25 @@ let modules = new Map();
 
 const MODULE_REGISTRY_ID = "modules";
 
+function getModuleRegistry() {
+    let moduleRegistry = localStorage.getItem(MODULE_REGISTRY_ID);
+    if(!moduleRegistry) {
+        moduleRegistry = '{ "modules": [] }';
+    }
+    return JSON.parse(moduleRegistry);
+}
+
+function saveModuleRegistry(reg) {
+    localStorage.setItem(MODULE_REGISTRY_ID, JSON.stringify(reg));
+}
+
 export default class Console {
     
     static async loadModules() {
-        const moduleRegistry = localStorage.getItem(MODULE_REGISTRY_ID);
-        if(moduleRegistry) {
-            const registry = JSON.parse(moduleRegistry);
-            for(let modulePath of registry.modules) {
-                const module = await Console.fetchModule(modulePath);
-                Console.installModule(module);
-            }
+        const moduleRegistry = getModuleRegistry();
+        for(let modulePath of moduleRegistry.modules) {
+            const module = await Console.fetchModule(modulePath);
+            Console.installModule(module);
         }
     }
 
@@ -32,15 +41,11 @@ export default class Console {
         module.origin = path;
 
         // register module in localstorage
-        let moduleRegistry = localStorage.getItem(MODULE_REGISTRY_ID);
-        if(!moduleRegistry) {
-            moduleRegistry = '{ "modules": [] }';
-        }
-        const registry = JSON.parse(moduleRegistry);
+        let registry = getModuleRegistry();
         if(registry.modules.indexOf(module.origin) === -1) {
             registry.modules.push(module.origin);
         }
-        localStorage.setItem(MODULE_REGISTRY_ID, JSON.stringify(registry));
+        saveModuleRegistry(registry);
 
         return module;
     }
@@ -77,7 +82,13 @@ export default class Console {
             if(module.commandName) {
                 commands[module.commandName] = null;
             }
-            Console.print(`[Module] Uninstalled module '${name}'`);
+
+            // nuregister
+            let moduleRegistry = getModuleRegistry();
+            moduleRegistry.modules.splice(moduleRegistry.modules.indexOf(module.origin), 1);
+            saveModuleRegistry(moduleRegistry);
+
+            Console.print(`[Module] Uninstalled module '${moduleName}'`);
         } else {
             Console.print("Module not found.");
         }

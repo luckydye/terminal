@@ -11,14 +11,18 @@ export default class ClockModule extends ConsoleModule {
         const draw = () => {
             const timeString = new Date().toLocaleTimeString();
 
-            context.alignText = "right";
-            context.font = "monospace 24px";
+            context.textAlign = "right";
+            context.font = "bold 24px monospace";
             context.fillText(timeString, context.canvas.width - 32, 32);
 
-            requestAnimationFrame(draw);
+            this.frame = requestAnimationFrame(draw);
         }
 
         draw();
+    }
+
+    static uninstall() {
+        cancelAnimationFrame(this.frame);
     }
 
 }
