@@ -38,9 +38,19 @@ class SubmitEvent extends Event {
 }
 
 class ShortcutEvent extends Event {
+
+    get defaultPrevented() {
+        return this._defaultPrevented;
+    }
+
+    set defaultPrevented(v) {
+        this._defaultPrevented = v;
+    }
+
     constructor(key) {
         super('shortcut');
         this.key = key;
+        this._defaultPrevented = false;
     }
 }
 
@@ -324,12 +334,12 @@ export default class Terminal extends HTMLElement {
 
         if(ctrl) {
             const ev = new ShortcutEvent(key);
-            const canceld = this.dispatchEvent(ev);
+            const canceled = this.dispatchEvent(ev);
 
-            if(!canceld) {
-                e.preventDefault();
-                e.stopPropagation();
+            e.preventDefault();
+            e.stopPropagation();
 
+            if(!ev.defaultPrevented) {
                 if(VALID_CHARS.indexOf(key) != -1) {
                     this.dispatchEvent(new SubmitEvent("^" + key));
                 }

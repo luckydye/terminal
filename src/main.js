@@ -87,16 +87,18 @@ setTimeout(async () => {
         if(e.key == "r") {
             location.reload();
         } else if(e.key == "v") {
-            e.preventDefault();
+            navigator.clipboard.readText().then(txt => {
+                terminal.write(txt);
+            })
+            e.defaultPrevented = true;
         }
     });
 
-    window.addEventListener('paste', e => {
-        e.clipboardData.items[0].getAsString(str => {
-            terminal.write(str);
-        });
-    })
-
-    window.addEventListener('contextmenu', e => e.preventDefault());
+    window.addEventListener('contextmenu', e => {
+        e.preventDefault();
+        navigator.clipboard.readText().then(txt => {
+            terminal.write(txt);
+        })
+    });
 
 }, 200);
