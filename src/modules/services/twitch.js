@@ -3,9 +3,14 @@ const API_CLIENT_SECRET = localStorage.twitch_client_secret;
 const API_AUTH_SCOPES = ``;
 
 let api_credentials = null;
+let Console;
+
+function setConsole(cnsl) {
+    Console = cnsl;
+}
 
 function auth() {
-    console.log('authorizing...');
+    Console.print('authorizing...');
     const url = `https://id.twitch.tv/oauth2/token?client_id=${API_CLIENT_ID}&client_secret=${API_CLIENT_SECRET}&grant_type=client_credentials&scope=${API_AUTH_SCOPES}`;
     return fetch(url, { method: "POST" }).then(res => res.json()).then(json => {
         return api_credentials = json;
@@ -57,7 +62,7 @@ async function queryClipsByStreamId(streamId) {
         const url = `https://clips-media-assets2.twitch.tv/${streamId}-offset-${offset}.mp4`;
 
         await fetch(url).then(res => {
-            console.log(url, res.status);
+            Console.print(url, res.status);
             // if(res.status != 403) {
             // }
         });
@@ -109,10 +114,10 @@ async function getUserFollowers(userName) {
 
     await getAllFollowers();
 
-    console.log(`${user.display_name} is following (${followersTotal.length}):`);
+    Console.print(`${user.display_name} is following (${followersTotal.length}):`);
 
     for(let user of followersTotal) {
-        console.log(`${user.followed_at}, ${user.to_name}`);
+        Console.print(`${user.followed_at}, ${user.to_name}`);
     }
 }
 
@@ -137,7 +142,7 @@ async function getChannelFollowers(channel) {
     async function getAllFollowers(cursor) {
         const followers = await getFollowerChunk(cursor);
 
-        console.log(`${followersTotal.length} / ${followers.total}`);
+        Console.print(`${followersTotal.length} / ${followers.total}`);
 
         followersTotal.push(...followers.data);
 
@@ -146,14 +151,14 @@ async function getChannelFollowers(channel) {
         }
     }
 
-    console.log(`Fethcing ${channel} followers,`);
+    Console.print(`Fethcing ${channel} followers,`);
     await getAllFollowers();
 
     return followersTotal;
 }
 
 async function getChannelViewerOverlap(channel1, channel2) {
-    console.log(`Getting channel follower overlap of ${channel1} and ${channel2}`);
+    Console.print(`Getting channel follower overlap of ${channel1} and ${channel2}`);
 
     const followers1 = await getChannelFollowers(channel1);
     const followers2 = await getChannelFollowers(channel2);
@@ -172,22 +177,23 @@ async function getChannelViewerOverlap(channel1, channel2) {
         hashmap[follower.from_id] = 0;
     }
 
-    console.log(`${overlap} of ${channel1}(${followers1.length}) [${(overlap / followers1.length * 100).toFixed(3)}%] are also in ${channel2}`);
+    Console.print(`${overlap} of ${channel1}(${followers1.length}) [${(overlap / followers1.length * 100).toFixed(3)}%] are also in ${channel2}`);
 
     return overlap / followers1.length * 100;
 }
 
 async function getChannelAllFollowers(channel) {
-    console.log('Getting channel followers...');
+    Console.print('Getting channel followers...');
 
     const followers = await getChannelFollowers(channel);
 
     for(let user of followers) {
-        console.log(`${user.followed_at}, ${user.from_name}`);
+        Console.print(`${user.followed_at}, ${user.from_name}`);
     }
 }
 
 module.exports = {
+    setConsole,
     getUserByLogin,
     getUserFollowers,
     getChannelViewerOverlap,

@@ -1,4 +1,5 @@
 import {
+    setConsole,
     getUserByLogin,
     getUserFollowers,
     getChannelViewerOverlap,
@@ -93,6 +94,7 @@ export default class TwitchModule extends ConsoleModule {
     }
 
     static async run(arguemnts) {
+        setConsole(Console);
         const command = arguemnts[0];
         const args = arguemnts.slice(1);
 
