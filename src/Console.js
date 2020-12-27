@@ -59,7 +59,7 @@ export default class Console {
         try {
             if(module.install) {
                 modules.set(name, module);
-                module.install(Console);
+                await module.install(Console);
 
                 Console.print(`[Module] Installed module '${name}'`);
     
@@ -150,6 +150,9 @@ export default class Console {
     }
     
     static print(str) {
+        if(typeof str == "object") {
+            str = JSON.stringify(str, null, '\t');
+        }
         const lines = str.split("\n");
         for (let line of lines) {
             terminal.write(line);

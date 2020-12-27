@@ -2,6 +2,7 @@ import commands from './Commands.js';
 import Console from './Console.js';
 import ConsoleModule from './ConsoleModule.js';
 import TestModule from './modules/test-module.js';
+import TwitchModule from './modules/twitch-module.js';
 
 const PREROLL = `
 
@@ -17,9 +18,8 @@ const PREROLL = `
 const INPUT_PREFIX = "terminal@52.59.209.57:~$ ";
 
 const nativeModules = [
-    '/statc/lib/minimal-module.js',
-    '/statc/lib/chat-module.js',
     TestModule,
+    TwitchModule,
 ]
 
 let idle = true;
@@ -35,6 +35,7 @@ setTimeout(async () => {
     await Console.sleep(100);
     await Console.simulateWrite("Initializing...\n\n", 4);
 
+    await Console.print("Loading native modules...\n");
     for(let modulePath of nativeModules) {
         let module = modulePath;
         if(typeof module === "string") {
@@ -46,6 +47,7 @@ setTimeout(async () => {
     }
     Console.print("");
 
+    await Console.print("Loading optional modules...\n");
     await Console.loadModules();
     Console.print("");
 
