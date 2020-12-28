@@ -27,7 +27,7 @@ let view = [0, 0];
 let prefix = "";
 let inputEnabled = true;
 let hideOutput = false;
-let history = [];
+let history = localStorage.history ? JSON.parse(localStorage.history) : [];
 let historyCursor = -1;
 
 class SubmitEvent extends Event {
@@ -200,10 +200,14 @@ export default class Terminal extends HTMLElement {
     }
 
     pushToHistory(input) {
+        if(input == history[0]) {
+            return;
+        }
         if(input != "") {
             history.unshift(input);
         }
         historyCursor = -1;
+        localStorage.history = JSON.stringify(history);
     }
 
     cancelInput() {

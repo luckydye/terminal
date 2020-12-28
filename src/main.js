@@ -3,6 +3,7 @@ import Console from './Console.js';
 import ConsoleModule from './ConsoleModule.js';
 import TestModule from './modules/test-module.js';
 import TwitchModule from './modules/twitch-module.js';
+import DownloadModule from './modules/dl-module.js';
 
 const PREROLL = `
 
@@ -20,6 +21,7 @@ const INPUT_PREFIX = "terminal@52.59.209.57:~$ ";
 const nativeModules = [
     TestModule,
     TwitchModule,
+    DownloadModule,
 ]
 
 let idle = true;
@@ -80,7 +82,13 @@ setTimeout(async () => {
                 terminal.read(INPUT_PREFIX);
                 idle = true;
             } else {
-                Console.print(`\nCommand "${args[0]}" not found.\n`);
+                try {
+                    const result = eval(args.join(" "));
+                    Console.print(result.toString());
+                } catch(err) {
+                    console.error(err);
+                    Console.print(`\nCommand "${args[0]}" not found.\n`);
+                }
             }
         }
     }
