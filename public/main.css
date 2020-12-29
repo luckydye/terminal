@@ -11,3 +11,7 @@ main {
     right: 0;
     display: flex;
 }
+
+gyro-terminal {
+    cursor: text;
+}

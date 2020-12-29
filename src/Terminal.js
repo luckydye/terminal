@@ -1,8 +1,10 @@
 const BORDER_PADDING = [32, 32];
 const CURSOR_OFFSET = [1, 0];
 const FONT_SIZE = 13;
-const FONT_WEIGHT = 300;
+const FONT_FAMILY = "monospace";
+const FONT_WEIGHT = 200;
 const FONT_COLOR = '#eee';
+const SLECTION_COLOR = '#717171';
 const SHADOW_BLUR = 0;
 const CURSOR_HEIGHT = 16;
 const CURSOR_WIDTH = 6;
@@ -445,7 +447,7 @@ export default class Terminal extends HTMLElement {
     draw(context) {
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
-        context.font = `${FONT_WEIGHT} ${FONT_SIZE}px monospace`;
+        context.font = `${FONT_WEIGHT} ${FONT_SIZE}px ${FONT_FAMILY}`;
         context.textAlign = 'left';
         context.textBaseline = 'top';
         
@@ -490,7 +492,7 @@ export default class Terminal extends HTMLElement {
         const start = this.bufferToPixelPos(...selection[0]);
         const end = this.bufferToPixelPos(...selection[1]);
 
-        context.globalCompositeOperation = "difference";
+        context.globalCompositeOperation = "screen";
         context.shadowColor = "";
         context.shadowBlur = 0;
 
@@ -518,7 +520,7 @@ export default class Terminal extends HTMLElement {
                 }
             }
 
-            context.fillStyle = FONT_COLOR;
+            context.fillStyle = SLECTION_COLOR;
             context.fillRect(x, y, width, this.lineHeight);
         }
 
