@@ -34,7 +34,6 @@ setTimeout(async () => {
     const terminal = Console.getTerminal();
     
     await Console.print(PREROLL);
-    await Console.sleep(100);
     await Console.simulateWrite("Initializing...\n\n", 4);
 
     await Console.print("Loading native modules...\n");
@@ -53,13 +52,11 @@ setTimeout(async () => {
     await Console.loadModules();
     Console.print("");
 
-    await Console.sleep(100);
     await Console.print("Connecting to Interface...", 4);
     
     const ws = Console.connectToWebSocket(async () => {
         Console.print('Connection established.');
         Console.print("");
-        await Console.sleep(100);
 
         while(true) {
             const value = await terminal.read(INPUT_PREFIX);
@@ -94,7 +91,7 @@ setTimeout(async () => {
                     evaluate.call(Console);
                 } catch(err) {
                     console.error(err);
-                    Console.print("[Error] " + err.message);
+                    Console.print("\n[Error] " + err.message);
                 }
             }
         }
@@ -109,13 +106,6 @@ setTimeout(async () => {
             })
             e.defaultPrevented = true;
         }
-    });
-
-    window.addEventListener('contextmenu', e => {
-        e.preventDefault();
-        navigator.clipboard.readText().then(txt => {
-            terminal.write(txt);
-        })
     });
 
 }, 200);

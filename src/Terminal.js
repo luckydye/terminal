@@ -2,7 +2,8 @@ const BORDER_PADDING = [32, 32];
 const CURSOR_OFFSET = [1, 0];
 const FONT_SIZE = 13;
 const FONT_WEIGHT = 300;
-const FONT_COLOR = '#99d0f7';
+const FONT_COLOR = '#eee';
+const SHADOW_BLUR = 0;
 const CURSOR_HEIGHT = 16;
 const CURSOR_WIDTH = 6;
 const VALID_CHARS = ` ~{}=<>^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ()[]-.,_:;#+'*/&%$§!?€1234567890"`;
@@ -24,6 +25,7 @@ let cursor = [
     buffer.length - 1
 ];
 let view = [0, 0];
+let selection = [[0,0], [0,0]];
 let prefix = "";
 let inputEnabled = true;
 let hideOutput = false;
@@ -97,19 +99,101 @@ export default class Terminal extends HTMLElement {
 
         window.addEventListener('wheel', e => {
             const dir = Math.sign(e.deltaY);
-            const lineHeight = CHAR_HEIGHT + LINE_PADDING;
 
             const cursorY = this.getCursorPosition()[1];
-            const maxY = Math.max(0, cursorY - (canvas.height - (lineHeight * 3)));
+            const maxY = Math.max(0, cursorY - (canvas.height - (this.lineHeight * 3)));
 
-            view[1] = Math.max(0, Math.min(maxY, view[1] + dir * lineHeight));
+            view[1] = Math.max(0, Math.min(maxY, view[1] + dir * this.lineHeight));
         });
 
         window.addEventListener('keydown', e => {
             this.handleInput(e);
         })
 
+
+        // mouse selections
+        let mouseStart = [0, 0];
+
+        const setSelection = (index, px, py) => {
+            const pos = this.pixelToBufferPos(
+                px + view[0], 
+                py + view[1]
+            );
+            selection[index][0] = pos[0];
+            selection[index][1] = pos[1];
+        }
+
+        const mouseDown = e => {
+            if(e.button === 0) {
+                mouseStart[0] = e.clientX;
+                mouseStart[1] = e.clientY;
+    
+                setSelection(0, e.clientX, e.clientY);
+                setSelection(1, e.clientX, e.clientY);
+                window.addEventListener("mousemove", mouseMove); 
+            }
+        }
+
+        const mouseUp = e => {
+            if(e.button === 0) {
+                let index = 1;
+                if(mouseStart[1] > e.clientY) {
+                    index = 0;
+                }
+                setSelection(index, e.clientX, e.clientY);
+                window.removeEventListener("mousemove", mouseMove);
+            }
+        }
+
+        const mouseMove = e => {
+            let index = 1;
+            if(mouseStart[1] > e.clientY) {
+                index = 0;
+            }
+            setSelection(index, e.clientX, e.clientY);
+        }
+
+        window.addEventListener("mousedown", mouseDown);
+        window.addEventListener("mouseup", mouseUp);
+
+        this.addEventListener("contextmenu", e => {
+            const txt = this.getSelectionFromBuffer(selection);
+            navigator.clipboard.writeText(txt);
+            this.resetSelection();
+            e.preventDefault();
+        });
+
         this.attachShadow({ mode: 'open' });
+    }
+    
+    resetSelection() {
+        selection = [[0,0], [0,0]];
+    }
+
+    getSelectionFromBuffer(selection) {
+        let copiedLines = [];
+
+        const startLine = selection[0][1];
+        const lines = selection[1][1] - selection[0][1];
+        const start = selection[0];
+        const end = selection[1];
+
+        for(let line = 0; line <= lines; line++) {
+            let a = line > 0 && lines > 0 ? 0 : start[0];
+            let b = line === lines ? end[0] : undefined;
+
+            const txt = buffer[startLine + line].slice(a, b);
+            copiedLines.push(txt);
+        }
+
+        return copiedLines.join("\n");
+    }
+
+    pixelToBufferPos(x, y) {
+        return [
+            Math.floor((x - BORDER_PADDING[0]) / CHAR_WIDTH), 
+            Math.floor((y - BORDER_PADDING[1]) / this.lineHeight)
+        ]
     }
 
     getContext() {
@@ -274,9 +358,8 @@ export default class Terminal extends HTMLElement {
                 cursor[0] += str.length;
         }
 
-        const lineHeight = CHAR_HEIGHT + LINE_PADDING;
         const cursorY = this.getCursorPosition()[1];
-        view[1] = Math.max(0, cursorY - (canvas.height - (lineHeight * 3)));
+        view[1] = Math.max(0, cursorY - (canvas.height - (this.lineHeight * 3)));
     }
 
     handleInput(e) {
@@ -355,9 +438,8 @@ export default class Terminal extends HTMLElement {
         canvas.width = this.clientWidth;
         canvas.height = this.clientHeight;
 
-        const lineHeight = CHAR_HEIGHT + LINE_PADDING;
         const cursorY = this.getCursorPosition()[1];
-        view[1] = Math.max(0, cursorY - (canvas.height - (lineHeight * 3)));
+        view[1] = Math.max(0, cursorY - (canvas.height - (this.lineHeight * 3)));
     }
 
     draw(context) {
@@ -371,7 +453,7 @@ export default class Terminal extends HTMLElement {
         CHAR_WIDTH = text.width;
 
         context.shadowColor = FONT_COLOR;
-        context.shadowBlur = 12;
+        context.shadowBlur = SHADOW_BLUR;
         
         context.fillStyle = FONT_COLOR;
 
@@ -380,6 +462,7 @@ export default class Terminal extends HTMLElement {
         if(this.inputEnabled) {
             this.drawCursor();
         }
+        this.drawSelection();
 
         context.shadowColor = "none";
         context.shadowBlur = 0;
@@ -396,8 +479,58 @@ export default class Terminal extends HTMLElement {
         }
     }
 
+    bufferToPixelPos(x, y) {
+        return [
+            x * CHAR_WIDTH + BORDER_PADDING[0] - view[0],
+            y * this.lineHeight + BORDER_PADDING[1] - view[1]
+        ]
+    }
+
+    drawSelection() {
+        const start = this.bufferToPixelPos(...selection[0]);
+        const end = this.bufferToPixelPos(...selection[1]);
+
+        context.globalCompositeOperation = "difference";
+        context.shadowColor = "";
+        context.shadowBlur = 0;
+
+        const lines = selection[1][1] - selection[0][1];
+        
+        for(let i = 0; i <= lines; i++) {
+            let x = 0;
+            const y = start[1] + (this.lineHeight * i);
+
+            let width = CHAR_WIDTH;
+
+            const xDiff = end[0] - start[0];
+
+            if(lines === i) {
+                width = xDiff + start[0];
+            } else {
+                width = canvas.width;
+            }
+
+            if(i === 0) {
+                x = start[0];
+
+                if(lines === i) {
+                    width = xDiff;
+                }
+            }
+
+            context.fillStyle = FONT_COLOR;
+            context.fillRect(x, y, width, this.lineHeight);
+        }
+
+        context.globalCompositeOperation = "";
+    }
+
     getMaxBufferWidth() {
         return canvas.width - (BORDER_PADDING[0] * 2);
+    }
+
+    get lineHeight() {
+        return CHAR_HEIGHT + LINE_PADDING;
     }
 
     getCursorPosition() {
@@ -417,7 +550,6 @@ export default class Terminal extends HTMLElement {
             }
         }
 
-        const lineHeight = CHAR_HEIGHT + LINE_PADDING;
         const x = BORDER_PADDING[0] + (cursor[0] * CHAR_WIDTH);
         const y = BORDER_PADDING[1] + (posY * CHAR_HEIGHT) + (posY * LINE_PADDING) + (CHAR_HEIGHT / 2) - (CURSOR_HEIGHT / 2);
 

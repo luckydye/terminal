@@ -25,7 +25,9 @@ export default class Console {
     static async loadModules() {
         const moduleRegistry = getModuleRegistry();
         for(let modulePath of moduleRegistry.modules) {
-            const module = await Console.fetchModule(modulePath);
+            const module = await Console.fetchModule(modulePath).catch(err => {
+                Console.print("[Module Error] Module: '"+modulePath+"': " + err.message);
+            });
             Console.installModule(module);
         }
     }
