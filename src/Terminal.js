@@ -366,6 +366,9 @@ export default class Terminal extends HTMLElement {
         context.font = `${FONT_WEIGHT} ${FONT_SIZE}px monospace`;
         context.textAlign = 'left';
         context.textBaseline = 'top';
+        
+        const text = context.measureText("M");
+        CHAR_WIDTH = text.width;
 
         context.shadowColor = FONT_COLOR;
         context.shadowBlur = 12;
@@ -398,9 +401,6 @@ export default class Terminal extends HTMLElement {
     }
 
     getCursorPosition() {
-        const text = context.measureText("M");
-        CHAR_WIDTH = text.width;
-
         const max_line_px_length = this.getMaxBufferWidth();
 
         let posY = 0;

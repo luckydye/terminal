@@ -72,6 +72,14 @@ setTimeout(async () => {
     });
 
     async function handleInput(args) {
+
+        function evaluate() {
+            const result = eval(args.join(" "));
+            if(result) {
+                Console.print(result.toString());
+            }
+        }
+
         if(args[0] != "") {
             if(commands[args[0]]) {
                 idle = false;
@@ -83,11 +91,10 @@ setTimeout(async () => {
                 idle = true;
             } else {
                 try {
-                    const result = eval(args.join(" "));
-                    Console.print(result.toString());
+                    evaluate.call(Console);
                 } catch(err) {
                     console.error(err);
-                    Console.print(`\nCommand "${args[0]}" not found.\n`);
+                    Console.print("[Error] " + err.message);
                 }
             }
         }
