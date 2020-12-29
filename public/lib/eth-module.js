@@ -47,7 +47,7 @@ export default class EthModule extends ConsoleModule {
             let i = 0;
             for(let line of lines) {
                 i++;
-                context.fillText(line, context.canvas.width - 32, 80 + (i * 20));
+                context.fillText(line, context.canvas.width - 32, 32 + (i * 20) - 20);
             }
 
             this.frame = requestAnimationFrame(draw);
