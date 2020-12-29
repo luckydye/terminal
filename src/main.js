@@ -52,22 +52,6 @@ setTimeout(async () => {
     await Console.loadModules();
     Console.print("");
 
-    await Console.print("Connecting to Interface...", 4);
-    
-    const ws = Console.connectToWebSocket(async () => {
-        Console.print('Connection established.');
-        Console.print("");
-
-        while(true) {
-            const value = await terminal.read(INPUT_PREFIX);
-            const args = value.split(" ");
-            await handleInput(args).catch(err => {
-                console.error(err);
-                Console.print(`\n[Internal Error]: ${err.message}\n`);
-            });
-        }
-    });
-
     async function handleInput(args) {
 
         function evaluate() {
@@ -107,5 +91,14 @@ setTimeout(async () => {
             e.defaultPrevented = true;
         }
     });
+
+    while(true) {
+        const value = await terminal.read(INPUT_PREFIX);
+        const args = value.split(" ");
+        await handleInput(args).catch(err => {
+            console.error(err);
+            Console.print(`\n[Internal Error]: ${err.message}\n`);
+        });
+    }
 
 }, 200);

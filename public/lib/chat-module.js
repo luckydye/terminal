@@ -1,4 +1,33 @@
-let Console;
+let Console, ws;
+
+async function connectToWebSocket() {
+    return new Promise((resolve, reject) => {
+        ws = new WebSocket(location.origin.replace("https", "wss").replace("http", "ws"));
+
+        ws.onopen = (event) => {
+            resolve(ws);
+        };
+
+        ws.onerror = (event) => {
+            reject(ws);
+        };
+    
+        ws.onmessage = (msg) => {
+            const terminal = Console.getTerminal();
+            const data = JSON.parse(msg.data);
+            
+            if(data.type == "message") {
+                const str = `${data.data.username}: ${data.data.text}`;
+                terminal.append(terminal.cursor[1], str);
+            }
+            
+            if(data.type == "left") {
+                const str = `${data.data.username} left the room.`;
+                terminal.append(terminal.cursor[1], str);
+            }
+        };
+    })
+}
 
 export default class ChatModule extends ConsoleModule {
 
@@ -6,12 +35,11 @@ export default class ChatModule extends ConsoleModule {
         return "chat";
     }
 
-    static install(cnsl) {
+    static async install(cnsl) {
         Console = cnsl;
     }
 
     static async run(args) {
-        const ws = Console.getSocket();
         const id = args[0];
 
         if(id == "" || !id) {
@@ -22,10 +50,12 @@ export default class ChatModule extends ConsoleModule {
         const terminal = Console.getTerminal();
         terminal.setPrefix("");
         terminal.disableInput();
-        await Console.simulateWrite('Connecting to chat...', 10);
+        await Console.simulateWrite('Connecting to chat...\n', 10);
+        await connectToWebSocket();
 
-        terminal.newline();
-        terminal.newline();
+        Console.print('Connection established.');
+        Console.print("");
+
         const username = await terminal.read("Username: ");
         terminal.newline();
 

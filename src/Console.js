@@ -95,34 +95,6 @@ export default class Console {
             Console.print("Module not found.");
         }
     }
-
-    static connectToWebSocket(callback = () => {}) {
-        ws = new WebSocket(location.origin.replace("https", "wss").replace("http", "ws"));
-    
-        ws.onopen = (event) => {
-            callback();
-        };
-    
-        ws.onmessage = (msg) => {
-            const data = JSON.parse(msg.data);
-            
-            if(data.type == "message") {
-                const str = `${data.data.username}: ${data.data.text}`;
-                terminal.append(terminal.cursor[1], str);
-            }
-            
-            if(data.type == "left") {
-                const str = `${data.data.username} left the room.`;
-                terminal.append(terminal.cursor[1], str);
-            }
-        };
-    
-        return ws;
-    }
-    
-    static getSocket() {
-        return ws;
-    }
     
     static getTerminal() {
         return terminal;
