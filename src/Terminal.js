@@ -8,7 +8,7 @@ const SLECTION_COLOR = '#717171';
 const SHADOW_BLUR = 0;
 const CURSOR_HEIGHT = 16;
 const CURSOR_WIDTH = 6;
-const VALID_CHARS = ` ~{}=<>^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ()[]-.,_:;#+'*/&%$§!?€1234567890"`;
+const VALID_CHARS = ` ~{}@=<>^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ()[]-.,_:;#+'*/&%$§!?€1234567890"`;
 const LINE_PADDING = 3;
 
 let LINE_WRAPPING = true;

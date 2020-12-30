@@ -1,9 +1,9 @@
 import commands from './Commands.js';
 import Console from './Console.js';
 import ConsoleModule from './ConsoleModule.js';
-import TestModule from './modules/test-module.js';
 import TwitchModule from './modules/twitch-module.js';
 import DownloadModule from './modules/dl-module.js';
+import WebsocketModule from './modules/ws-module.js';
 
 const PREROLL = `
 
@@ -19,7 +19,7 @@ const PREROLL = `
 const INPUT_PREFIX = "terminal@52.59.209.57:~$ ";
 
 const nativeModules = [
-    TestModule,
+    WebsocketModule,
     TwitchModule,
     DownloadModule,
 ]
