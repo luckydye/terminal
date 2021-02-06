@@ -20,7 +20,13 @@ function saveModuleRegistry(reg) {
     localStorage.setItem(MODULE_REGISTRY_ID, JSON.stringify(reg));
 }
 
+let idle = true;
+
 export default class Console {
+
+    static get INPUT_PREFIX() {
+        return "terminal@web:~$ ";
+    }
     
     static async loadModules() {
         const moduleRegistry = getModuleRegistry();
@@ -29,6 +35,42 @@ export default class Console {
                 Console.print("[Module Error] Module: '"+modulePath+"': " + err.message);
             });
             Console.installModule(module);
+        }
+    }
+
+    static async evaluateInput(args) {
+        function evaluate() {
+            const result = eval(args.join(" "));
+            if(result) {
+                Console.print(result.toString());
+            }
+        }
+
+        if(args[0] != "") {
+            if(commands[args[0]]) {
+                idle = false;
+                document.title = args[0];
+                let exit;
+                try {
+                    exit = await commands[args[0]](args.slice(1));
+                } catch(err) {
+                    document.title = "Terminal";
+                    throw new Error(e);
+                }
+                document.title = "Terminal";
+                if(exit !== 0 && exit != undefined) {
+                    Console.print("\nProcess exited.\n");
+                }
+                terminal.read(this.INPUT_PREFIX);
+                idle = true;
+            } else {
+                try {
+                    evaluate.call(Console);
+                } catch(err) {
+                    console.error(err);
+                    Console.print("\n[Error] " + err.message);
+                }
+            }
         }
     }
 
@@ -69,7 +111,7 @@ export default class Console {
                     commands[module.commandName] = module.run;
                 }
             } else {
-                throw new Error(`Missing install method in module: ${path}`);
+                throw new Error(`Missing install method in module: ${name}`);
             }
         } catch(err) {
             Console.print("[Error] " + err.message);

@@ -1,7 +1,7 @@
 const PACKAGE = require("./package.json");
 const path = require("path");
 const webpack = require("webpack");
-const WebpackObfuscator = require('webpack-obfuscator');
+// const WebpackObfuscator = require('webpack-obfuscator');
 
 module.exports = {
     mode: 'production',
@@ -10,21 +10,21 @@ module.exports = {
     },
     output: {
         globalObject: "self",
-        filename: "[name].min.js",
+        filename: "terminal.min.js",
         path: path.resolve(__dirname, "public"),
     },
     module: {
-        rules: [
-            {
-                test: /\.js$/,
-                enforce: 'post',
-                use: { 
-                    loader: WebpackObfuscator.loader, 
-                    options: {
-                        rotateStringArray: true
-                    }
-                }
-            }
-        ]
+        // rules: [
+        //     {
+        //         test: /\.js$/,
+        //         enforce: 'post',
+        //         use: { 
+        //             loader: WebpackObfuscator.loader, 
+        //             options: {
+        //                 rotateStringArray: true
+        //             }
+        //         }
+        //     }
+        // ]
     }
 };

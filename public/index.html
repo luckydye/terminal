@@ -6,8 +6,8 @@
     
     <title>Terminal</title>
 
-    <link rel="stylesheet" href="/statc/main.css">
-    
+    <script type="module" src="./terminal.min.js"></script>
+
     <script>
         function fetchModule(path) {
             return import(path).then(res => {
@@ -16,9 +16,27 @@
             })
         }
     </script>
+
+    <style>
+        body {
+            margin: 0;
+        }
+
+        gyro-terminal {
+            background: #131313;
+            cursor: text;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            display: flex;
+        }
+    </style>
 </head>
 <body>
-    <main id="mainEle"></main>
-    <script type="module" src="/statc/main.min.js"></script>
+    <script>
+        window.addEventListener('load', e => window.initialiseTerminal());
+    </script>
 </body>
 </html>

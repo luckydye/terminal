@@ -206,9 +206,13 @@ export default class Terminal extends HTMLElement {
         const style = document.createElement('style');
         style.innerHTML = `
             :host {
-                display: block;
                 width: 100%;
                 height: 100%;
+            }
+            :host(:focus) {
+                z-index: 1000000;
+                opacity: 1;
+                pointer-events: all;
             }
             canvas {
                 filter: contrast(1.1) blur(.33px);
@@ -218,6 +222,7 @@ export default class Terminal extends HTMLElement {
         this.shadowRoot.appendChild(style);
         this.shadowRoot.appendChild(canvas);
     
+        this.tabIndex = 0;
         this.loop();
     }
 
@@ -446,6 +451,8 @@ export default class Terminal extends HTMLElement {
 
     draw(context) {
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+
+        if(canvas.width <= 0) return;
 
         context.font = `${FONT_WEIGHT} ${FONT_SIZE}px ${FONT_FAMILY}`;
         context.textAlign = 'left';

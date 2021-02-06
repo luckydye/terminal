@@ -1,4 +1,13 @@
 export default class ConsoleModule {
+
+    static get moduleName() {
+        return "console-module";
+    }
+    
+    static get commandName() {
+        return "";
+    }
+
     static install() {
         
     }
