@@ -4,7 +4,7 @@ const webpack = require("webpack");
 // const WebpackObfuscator = require('webpack-obfuscator');
 
 module.exports = {
-    mode: 'production',
+    mode: 'development',
     entry: {
         main: "./src/main.js",
     },

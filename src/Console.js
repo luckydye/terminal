@@ -55,7 +55,7 @@ export default class Console {
                     exit = await commands[args[0]](args.slice(1));
                 } catch(err) {
                     document.title = "Terminal";
-                    throw new Error(e);
+                    throw new Error(err);
                 }
                 document.title = "Terminal";
                 if(exit !== 0 && exit != undefined) {
