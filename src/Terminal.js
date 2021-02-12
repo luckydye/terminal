@@ -266,6 +266,9 @@ export default class Terminal extends HTMLElement {
 
     clear() {
         buffer = [""];
+        for(let ele of htmlElements) {
+            ele.remove();
+        }
         this.setCursor(0, 0);
     }
 
