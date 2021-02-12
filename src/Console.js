@@ -176,6 +176,10 @@ export default class Console {
         }
     }
     
+    static printHTML(width, height, content) {
+        this.print(`\\\\\\HTML ${width} ${height} ${content}`);
+    }
+    
     static sleep(time) {
         return new Promise((resolve) => {
             setTimeout(() => resolve(), time);

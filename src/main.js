@@ -5,6 +5,8 @@ import DownloadModule from './modules/dl.js';
 import TwitchModule from './modules/twitch.js';
 import WebsocketModule from './modules/ws.js';
 import TitleModule from './modules/title.js';
+import EchoModule from './modules/echo.js';
+import HTMLModule from './modules/html.js';
 
 function init() {
     
@@ -18,6 +20,8 @@ function init() {
 (@@@        %           /@@@.                        @@@(            
   .@                    /@@@.     @@@@@@@@@@@@@      @@@@@@@@@@@@@@@/
 
+\\\\\\HTML 500 100 <img height="100" src="https://cdn.betterttv.net/emote/5ada077451d4120ea3918426/3x"/> <img height="100" src="https://cdn.betterttv.net/emote/5ada077451d4120ea3918426/3x"/>
+
     `;
 
     const nativeModules = [
@@ -25,6 +29,8 @@ function init() {
         TwitchModule,
         DownloadModule,
         TitleModule,
+        EchoModule,
+        HTMLModule,
         ...FileSystem.modules,
     ]
 

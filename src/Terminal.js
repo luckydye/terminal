@@ -34,6 +34,8 @@ let hideOutput = false;
 let history = localStorage.history ? JSON.parse(localStorage.history) : [];
 let historyCursor = -1;
 
+const htmlElements = {};
+
 class SubmitEvent extends Event {
     constructor(value) {
         super('submit');
@@ -208,6 +210,7 @@ export default class Terminal extends HTMLElement {
             :host {
                 width: 100%;
                 height: 100%;
+                overflow: hidden;
             }
             :host(:focus) {
                 z-index: 1000000;
@@ -217,6 +220,18 @@ export default class Terminal extends HTMLElement {
             canvas {
                 filter: contrast(1.1) blur(.33px);
                 outline: none;
+            }
+            .inline-element {
+                position: fixed;
+                top: calc(var(--elementY) * 1px - var(--scrollY) * 1px);
+                left: calc(var(--elementX) * 1px);
+                height: calc(var(--elementHeight) * 1px);
+                width: calc(var(--elementWidth) * 1px);
+                display: block;
+                overflow: hidden;
+            }
+            .inline-element + * {
+                display: inline;
             }
         `;
         this.shadowRoot.appendChild(style);
@@ -475,6 +490,8 @@ export default class Terminal extends HTMLElement {
 
         context.shadowColor = "none";
         context.shadowBlur = 0;
+
+        this.style.setProperty('--scrollY', view[1]);
     }
 
     drawCursor() {
@@ -548,14 +565,20 @@ export default class Terminal extends HTMLElement {
         let posY = 0;
         for(let i = 0; i < cursor[1]; i++) {
             const line = buffer[i];
-            const text = context.measureText(line);
-            if(max_line_px_length - text.width < 0 && LINE_WRAPPING) {
-                const parts = sliceLine(line, max_line_px_length / CHAR_WIDTH);
-                for(let part of parts) {
+
+            const html = this.parseHTMLLine(line);
+            if(html) {
+                posY += html.height / this.lineHeight;
+            } else {
+                const text = context.measureText(line);
+                if(max_line_px_length - text.width < 0 && LINE_WRAPPING) {
+                    const parts = sliceLine(line, max_line_px_length / CHAR_WIDTH);
+                    for(let part of parts) {
+                        posY++;
+                    }
+                } else {
                     posY++;
                 }
-            } else {
-                posY++;
             }
         }
 
@@ -565,26 +588,58 @@ export default class Terminal extends HTMLElement {
         return [x + CURSOR_OFFSET[0], y + CURSOR_OFFSET[1]];
     }
 
+    parseHTMLLine(line) {
+        if(line.slice(0, 7) == "\\\\\\HTML") {
+            const htmlMeta = line.slice(7).split(" ").slice(0, 3).join(" ");
+            const [ nul, width, height ] = htmlMeta.split(" ").map(v => +v);
+
+            return {
+                content: line.slice(7 + htmlMeta.length),
+                width, 
+                height: Math.round(height / this.lineHeight) * this.lineHeight
+            }
+        }
+    }
+
     drawBuffer() {
         const max_line_px_length = this.getMaxBufferWidth();
 
         let x = BORDER_PADDING[0];
         let y = BORDER_PADDING[1] - view[1];
 
-        const drawLine = (line) => {
+        const drawLine = (line, index) => {
             context.fillText(line, x, y);
             y += CHAR_HEIGHT + LINE_PADDING;
         }
 
+        let index = -1;
         for(let line of buffer) {
-            const text = context.measureText(line);
-            if(max_line_px_length - text.width < 0 && LINE_WRAPPING) {
-                const parts = sliceLine(line, max_line_px_length / CHAR_WIDTH);
-                for(let part of parts) {
-                    drawLine(part);
+            index++;
+
+            const html = this.parseHTMLLine(line);
+            if(html) {
+                if(!htmlElements[index]) {
+                    htmlElements[index] = document.createElement('div');
+                    const ele = htmlElements[index];
+                    ele.className = "inline-element";
+                    ele.style.setProperty('--elementY', y + view[1]);
+                    ele.style.setProperty('--elementX', x);
+                    ele.style.setProperty('--elementWidth', html.width);
+                    ele.style.setProperty('--elementHeight', html.height);
+                    ele.innerHTML = html.content || "";
+                    this.shadowRoot.appendChild(ele);
                 }
+                y += html.height;
             } else {
-                drawLine(line);
+                const text = context.measureText(line);
+                if(max_line_px_length - text.width < 0 && LINE_WRAPPING) {
+                    const parts = sliceLine(line, max_line_px_length / CHAR_WIDTH);
+                    for(let part of parts) {
+                        drawLine(part);
+                    }
+                } else {
+                    drawLine(line);
+                }
             }
         }
     }
