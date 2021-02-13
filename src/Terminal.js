@@ -102,7 +102,7 @@ export default class Terminal extends HTMLElement {
         })
 
         window.addEventListener('wheel', e => {
-            const dir = Math.sign(e.deltaY);
+            const dir = Math.sign(e.deltaY) * 2;
 
             const cursorY = this.getCursorPosition()[1];
             const maxY = Math.max(0, cursorY - (canvas.height - (this.lineHeight * 3)));
@@ -229,6 +229,9 @@ export default class Terminal extends HTMLElement {
                 width: calc(var(--elementWidth) * 1px);
                 display: block;
                 overflow: hidden;
+                color: #eee;
+                font-family: monospace;
+                user-select: none;
             }
             .inline-element + * {
                 display: inline;

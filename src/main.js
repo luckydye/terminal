@@ -21,6 +21,7 @@ function init() {
   .@                    /@@@.     @@@@@@@@@@@@@      @@@@@@@@@@@@@@@/
 
 \\\\\\HTML 500 100 <img height="100" src="https://cdn.betterttv.net/emote/5ada077451d4120ea3918426/3x"/> <img height="100" src="https://cdn.betterttv.net/emote/5ada077451d4120ea3918426/3x"/>
+\\\\\\HTML 500 15 <a>Testing the html text font.</a>
 
     `;
 
