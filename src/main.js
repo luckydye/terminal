@@ -8,7 +8,7 @@ import TitleModule from './modules/title.js';
 import EchoModule from './modules/echo.js';
 import HTMLModule from './modules/html.js';
 
-function init() {
+async function init() {
     
     const PREROLL = `
 
@@ -37,7 +37,6 @@ function init() {
 
     const terminal = Console.getTerminal();
     terminal.disableInput();
-    document.body.appendChild(terminal);
 
     setTimeout(async () => {
         const terminal = Console.getTerminal();
@@ -82,8 +81,15 @@ function init() {
         }
 
     }, 200);
+
+    return terminal;
 }
 
-window.initialiseTerminal = () => {
-    init();
+window.initialiseTerminal = async () => {
+    const terminal = await init();
+    document.body.appendChild(terminal);
+}
+
+window.createTerminal = async () => {
+    return await init();
 }
