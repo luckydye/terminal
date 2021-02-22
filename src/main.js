@@ -82,11 +82,12 @@ async function init() {
 
     }, 200);
 
-    return terminal;
+    return Console;
 }
 
 window.initialiseTerminal = async () => {
-    const terminal = await init();
+    const Cnsl = await init();
+    const terminal = Cnsl.getTerminal();
     document.body.appendChild(terminal);
 }
 
