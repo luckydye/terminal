@@ -176,9 +176,9 @@ export default class Console {
         }
     }
 
-    static readLine(prefix = "") {
+    static async readLine(prefix = "") {
         const value = await terminal.read(prefix);
-        Console.print(value);
+        return value;
     }
 
     static log(...str) {
