@@ -175,6 +175,11 @@ export default class Console {
             terminal.write('\n');
         }
     }
+
+    static log(...str) {
+        const ts = `${new Date().toGMTString()}: `;
+        return this.print(ts + str.join(" "));
+    }
     
     static printHTML(width, height, content) {
         this.print(`\\\\\\HTML ${width} ${height} ${content}`);
