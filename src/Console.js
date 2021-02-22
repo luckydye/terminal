@@ -97,7 +97,7 @@ export default class Console {
     static async installModule(module) {
         const name = module.moduleName || module.origin;
         if(modules.get(name)) {
-            Console.print(`[Module] Module '${name}' already installed.`);
+            Console.log(`[Module] Module '${name}' already installed.`);
             return;
         }
         try {
@@ -105,7 +105,7 @@ export default class Console {
                 modules.set(name, module);
                 await module.install(Console);
 
-                Console.print(`[Module] Installed module '${name}'`);
+                Console.log(`[Module] Installed module '${name}'`);
     
                 if(module.commandName) {
                     commands[module.commandName] = module.run;
@@ -114,7 +114,7 @@ export default class Console {
                 throw new Error(`Missing install method in module: ${name}`);
             }
         } catch(err) {
-            Console.print("[Error] " + err.message);
+            Console.log("[Error] " + err.message);
         }
     }
 

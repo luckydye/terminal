@@ -22,7 +22,6 @@ async function init() {
 
 \\\\\\HTML 500 100 <img height="100" src="https://cdn.betterttv.net/emote/5ada077451d4120ea3918426/3x"/> <img height="100" src="https://cdn.betterttv.net/emote/5ada077451d4120ea3918426/3x"/>
 \\\\\\HTML 500 15 <a>Testing the html text font.</a>
-
     `;
 
     const nativeModules = [
@@ -42,21 +41,19 @@ async function init() {
         const terminal = Console.getTerminal();
         
         await Console.print(PREROLL);
-        await Console.simulateWrite("Initializing...\n\n", 4);
+        await Console.log("Initializing");
 
-        await Console.print("Loading native modules...\n");
+        await Console.log("Loading modules\n");
         for(let modulePath of nativeModules) {
             let module = modulePath;
             if(typeof module === "string") {
                 module = await Console.fetchModule(modulePath).catch(err => {
-                    Console.print("[Error] " + err.message);
+                    Console.log("[Error] " + err.message);
                 })
             }
             await Console.installModule(module);
         }
-        Console.print("");
 
-        await Console.print("Loading optional modules...\n");
         await Console.loadModules();
         Console.print("");
 
