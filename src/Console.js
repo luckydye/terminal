@@ -176,6 +176,11 @@ export default class Console {
         }
     }
 
+    static readLine(prefix = "") {
+        const value = await terminal.read(prefix);
+        Console.print(value);
+    }
+
     static log(...str) {
         const ts = `${new Date().toGMTString()}: `;
         return this.print(ts + str.join(" "));
