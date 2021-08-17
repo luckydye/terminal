@@ -93,6 +93,8 @@ export default class Terminal extends HTMLElement {
     constructor() {
         super();
 
+        this.bounds = { x: 0, y: 0 };
+
         canvas = document.createElement('canvas');
         canvas.tabIndex = 0;
         context = canvas.getContext("2d");
@@ -110,7 +112,7 @@ export default class Terminal extends HTMLElement {
             view[1] = Math.max(0, Math.min(maxY, view[1] + dir * this.lineHeight));
         });
 
-        window.addEventListener('keydown', e => {
+        this.addEventListener('keydown', e => {
             this.handleInput(e);
         })
 
@@ -128,33 +130,42 @@ export default class Terminal extends HTMLElement {
         }
 
         const mouseDown = e => {
+            let x = e.clientX - this.bounds.x;
+            let y = e.clientY - this.bounds.y;
+
             if(e.button === 0) {
-                mouseStart[0] = e.clientX;
-                mouseStart[1] = e.clientY;
+                mouseStart[0] = x;
+                mouseStart[1] = y;
     
-                setSelection(0, e.clientX, e.clientY);
-                setSelection(1, e.clientX, e.clientY);
+                setSelection(0, x, y);
+                setSelection(1, x, y);
                 window.addEventListener("mousemove", mouseMove); 
             }
         }
 
         const mouseUp = e => {
+            let x = e.clientX - this.bounds.x;
+            let y = e.clientY - this.bounds.y;
+
             if(e.button === 0) {
                 let index = 1;
-                if(mouseStart[1] > e.clientY) {
+                if(mouseStart[1] > y) {
                     index = 0;
                 }
-                setSelection(index, e.clientX, e.clientY);
+                setSelection(index, x, y);
                 window.removeEventListener("mousemove", mouseMove);
             }
         }
 
         const mouseMove = e => {
+            let x = e.clientX - this.bounds.x;
+            let y = e.clientY - this.bounds.y;
+
             let index = 1;
-            if(mouseStart[1] > e.clientY) {
+            if(mouseStart[1] > y) {
                 index = 0;
             }
-            setSelection(index, e.clientX, e.clientY);
+            setSelection(index, x, y);
         }
 
         window.addEventListener("mousedown", mouseDown);
@@ -222,7 +233,7 @@ export default class Terminal extends HTMLElement {
                 outline: none;
             }
             .inline-element {
-                position: fixed;
+                position: absolute;
                 top: calc(var(--elementY) * 1px - var(--scrollY) * 1px);
                 left: calc(var(--elementX) * 1px);
                 height: calc(var(--elementHeight) * 1px);
@@ -468,6 +479,8 @@ export default class Terminal extends HTMLElement {
 
         const cursorY = this.getCursorPosition()[1];
         view[1] = Math.max(0, cursorY - (canvas.height - (this.lineHeight * 3)));
+
+        this.bounds = this.getClientRects()[0];
     }
 
     draw(context) {
@@ -658,6 +671,10 @@ export default class Terminal extends HTMLElement {
 }
 
 function sliceLine(line, maxLength) {
+    if(maxLength < 0) {
+        return [];
+    }
+
     const parts = [];
 
     line = line.split("");

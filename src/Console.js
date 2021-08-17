@@ -3,7 +3,6 @@ import Terminal from './Terminal.js';
 
 const terminal = new Terminal();
 
-let ws;
 let modules = new Map();
 
 const MODULE_REGISTRY_ID = "modules";
