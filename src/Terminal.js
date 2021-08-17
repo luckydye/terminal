@@ -130,6 +130,8 @@ export default class Terminal extends HTMLElement {
         }
 
         const mouseDown = e => {
+            if(!this.bounds) return;
+
             let x = e.clientX - this.bounds.x;
             let y = e.clientY - this.bounds.y;
 
@@ -144,6 +146,8 @@ export default class Terminal extends HTMLElement {
         }
 
         const mouseUp = e => {
+            if(!this.bounds) return;
+
             let x = e.clientX - this.bounds.x;
             let y = e.clientY - this.bounds.y;
 
@@ -158,6 +162,8 @@ export default class Terminal extends HTMLElement {
         }
 
         const mouseMove = e => {
+            if(!this.bounds) return;
+            
             let x = e.clientX - this.bounds.x;
             let y = e.clientY - this.bounds.y;
 
