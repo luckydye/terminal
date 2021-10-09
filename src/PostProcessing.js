@@ -49,8 +49,8 @@ export function createWebgl2Canvas(canvas, options = {
             float bloom_scale = 1.0;
 
             float r = texture(u_texture, vec2(v_uv.x - (ca_scale / resolution.x), v_uv.y)).r;
-            float g = texture(u_texture, vec2(v_uv.x, v_uv.y - (ca_scale / resolution.x))).g;
-            float b = texture(u_texture, vec2(v_uv.x - (ca_scale / resolution.x), v_uv.y - (ca_scale / resolution.x))).b;
+            float g = texture(u_texture, vec2(v_uv.x, v_uv.y - ((ca_scale / resolution.x) * 1.5))).g;
+            float b = texture(u_texture, vec2(v_uv.x, v_uv.y + ((ca_scale / resolution.x) * 2.0) )).b;
 
             vec4 rgba = vec4(r, g, b, 1.0);
 
