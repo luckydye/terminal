@@ -1,3 +1,5 @@
+import { createWebgl2Canvas } from './PostProcessing.js';
+
 const BORDER_PADDING = [32, 32];
 const CURSOR_OFFSET = [1, 0];
 const FONT_SIZE = 13;
@@ -33,6 +35,8 @@ let inputEnabled = true;
 let hideOutput = false;
 let history = localStorage.history ? JSON.parse(localStorage.history) : [];
 let historyCursor = -1;
+
+let img = new Image();
 
 const htmlElements = {};
 
@@ -88,6 +92,10 @@ export default class Terminal extends HTMLElement {
 
     get cursor() {
         return cursor;
+    }
+
+    focus() {
+        canvas.focus();
     }
 
     constructor() {
@@ -255,9 +263,17 @@ export default class Terminal extends HTMLElement {
             }
         `;
         this.shadowRoot.appendChild(style);
-        this.shadowRoot.appendChild(canvas);
+
+        const postCanvas = document.createElement('canvas');
+        postCanvas.width = 1280;
+        postCanvas.height = 720;
+        this.postCavnas = createWebgl2Canvas(postCanvas);
+        this.postCavnas.reformat(this.clientWidth, this.clientHeight);
+
+        this.postCavnas.canvas.tabIndex = 0;
+
+        this.shadowRoot.appendChild(this.postCavnas.canvas);
     
-        this.tabIndex = 0;
         this.loop();
     }
 
@@ -477,11 +493,16 @@ export default class Terminal extends HTMLElement {
                 }
             }
         }
+
+        e.preventDefault();
+        e.stopPropagation();
     }
 
     reformat() {
         canvas.width = this.clientWidth;
         canvas.height = this.clientHeight;
+
+        this.postCavnas.reformat(canvas.width, canvas.height);
 
         const cursorY = this.getCursorPosition()[1];
         view[1] = Math.max(0, cursorY - (canvas.height - (this.lineHeight * 3)));
@@ -490,7 +511,9 @@ export default class Terminal extends HTMLElement {
     }
 
     draw(context) {
-        context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+        context.globalCompositeOperation = "normal";
+        context.fillStyle = "#0c0c0c";
+        context.fillRect(0, 0, context.canvas.width, context.canvas.height);
 
         if(canvas.width <= 0) return;
 
@@ -517,6 +540,11 @@ export default class Terminal extends HTMLElement {
         context.shadowBlur = 0;
 
         this.style.setProperty('--scrollY', view[1]);
+
+        img.onload = () => {
+            this.postCavnas.draw(img);
+        }
+        img.src = canvas.toDataURL();
     }
 
     drawCursor() {
@@ -671,7 +699,7 @@ export default class Terminal extends HTMLElement {
 
     loop() {
         this.draw(context);
-        requestAnimationFrame(this.loop.bind(this));
+        setTimeout(this.loop.bind(this), 1000 / 60);
     }
 
 }

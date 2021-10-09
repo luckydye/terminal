@@ -182,7 +182,7 @@ export default class Console {
 
     static log(...str) {
         const ts = `${new Date().toGMTString()}: `;
-        return this.print(ts + str.join(" "));
+        return this.print(str.join(" "));
     }
     
     static printHTML(width, height, content) {
@@ -193,5 +193,9 @@ export default class Console {
         return new Promise((resolve) => {
             setTimeout(() => resolve(), time);
         })
+    }
+    
+    static clear() {
+        terminal.clear();
     }
 }

@@ -6,7 +6,7 @@
     
     <title>Terminal</title>
 
-    <script type="module" src="/terminal.min.js"></script>
+    <script type="module" src="./terminal.min.js"></script>
 
     <script>
         function fetchModule(path) {
@@ -20,6 +20,7 @@
     <style>
         body {
             margin: 0;
+            background: #000;
         }
 
         gyro-terminal {
@@ -36,7 +37,11 @@
 </head>
 <body>
     <script>
-        window.addEventListener('load', e => window.initialiseTerminal());
+        window.addEventListener('load', async e => {
+            const Cnsl = await window.createTerminal();
+            const terminal = Cnsl.getTerminal();
+            document.body.appendChild(terminal);
+        });
     </script>
 </body>
 </html>

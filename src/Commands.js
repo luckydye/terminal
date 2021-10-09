@@ -44,6 +44,8 @@ export default {
             terminal.clear();
             Console.print("Bye.");
 
+            terminal.remove();
+
             setTimeout(() => window.close(), 1000);
         })
     }

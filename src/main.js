@@ -1,33 +1,50 @@
 import './ConsoleModule.js';
 import Console from './Console.js';
 import FileSystem from './FileSystem.js';
-import DownloadModule from './modules/dl.js';
-import TwitchModule from './modules/twitch.js';
 import WebsocketModule from './modules/ws.js';
 import TitleModule from './modules/title.js';
 import EchoModule from './modules/echo.js';
 import HTMLModule from './modules/html.js';
 
-async function init() {
+async function startSequence() {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            Console.clear();
+            Console.print("Booting up .");
+        }, 1000 * 1);
+        setTimeout(() => {
+            Console.clear();
+            Console.print("Booting up ..");
+        }, 1000 * 2);
+        setTimeout(() => {
+            Console.clear();
+            Console.print("Booting up ...");
+        }, 1000 * 3);
+        setTimeout(() => {
+            Console.clear();
+            Console.print("Booting up .");
+        }, 1000 * 4);
+        setTimeout(() => {
+            Console.clear();
+            Console.print("Booting up ..");
+        }, 1000 * 5);
+        setTimeout(() => {
+            Console.clear();
+            resolve();
+        }, 1000 * 6);
+    })
+}
+
+async function sleep(seconds = 1) {
+    return new Promise((resolve) => {
+        setTimeout(() => resolve(), 1000 * seconds);
+    })
+}
+
+async function initTerminal() {
     
-    const PREROLL = `
-
-@@@@@@            .@@@@@@@@@@@@@@@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@ 
-@@@@@@@@,               /@@@.                        @@@(            
-@@@@  @@@@#             /@@@.                        @@@(            
-@@@@    @@@@@@@@@       /@@@.     @@@@@@@@@@@&       @@@(            
-@@@@      @@@@@         /@@@.                        @@@(            
-(@@@        %           /@@@.                        @@@(            
-  .@                    /@@@.     @@@@@@@@@@@@@      @@@@@@@@@@@@@@@/
-    `;
-
-// \\\\\\HTML 500 100 <img height="100" src="https://cdn.betterttv.net/emote/5ada077451d4120ea3918426/3x"/> <img height="100" src="https://cdn.betterttv.net/emote/5ada077451d4120ea3918426/3x"/>
-// \\\\\\HTML 500 15 <a>Testing the html text font.</a>
-
     const nativeModules = [
         WebsocketModule,
-        TwitchModule,
-        DownloadModule,
         TitleModule,
         EchoModule,
         HTMLModule,
@@ -35,15 +52,19 @@ async function init() {
     ]
 
     const terminal = Console.getTerminal();
+    terminal.clear();
     terminal.disableInput();
 
     setTimeout(async () => {
         const terminal = Console.getTerminal();
         
-        await Console.print(PREROLL);
-        await Console.log("Initializing");
+        await startSequence();
+        
+        await Console.simulateWrite("Initializing\n\n");
+        await sleep();
 
         await Console.log("Loading modules\n");
+        await sleep(0.5);
         for(let modulePath of nativeModules) {
             let module = modulePath;
             if(typeof module === "string") {
@@ -52,6 +73,7 @@ async function init() {
                 })
             }
             await Console.installModule(module);
+            await sleep(0.05);
         }
 
         await Console.loadModules();
@@ -77,17 +99,11 @@ async function init() {
             });
         }
 
-    }, 200);
+    }, 50);
 
     return Console;
 }
 
-window.initialiseTerminal = async () => {
-    const Cnsl = await init();
-    const terminal = Cnsl.getTerminal();
-    document.body.appendChild(terminal);
-}
-
 window.createTerminal = async () => {
-    return await init();
+    return await initTerminal();
 }
