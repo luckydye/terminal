@@ -541,10 +541,8 @@ export default class Terminal extends HTMLElement {
 
         this.style.setProperty('--scrollY', view[1]);
 
-        img.onload = () => {
-            this.postCavnas.draw(img);
-        }
-        img.src = canvas.toDataURL();
+        img = context.getImageData(0, 0, canvas.width, canvas.height);
+        this.postCavnas.draw(img);
     }
 
     drawCursor() {
